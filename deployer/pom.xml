@@ -25,13 +25,21 @@
       <artifactId>scala-library</artifactId>
     </dependency>
     <dependency>
+      <groupId>org.scala-lang</groupId>
+      <artifactId>scala-compiler</artifactId>
+    </dependency>    
+    <dependency>
       <groupId>org.ops4j.pax.logging</groupId>
       <artifactId>pax-logging-api</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.felix</groupId>
       <artifactId>org.apache.felix.fileinstall</artifactId>
-    </dependency>    
+    </dependency>
+    <dependency>
+      <groupId>junit</groupId>
+      <artifactId>junit</artifactId>
+    </dependency>
   </dependencies>
 
   <build>
@@ -81,8 +89,8 @@
                     !${pom.artifactId}*,
                     org.apache.commons.logging;version="[1.1, 1.2)",
                     org.apache.felix.fileinstall*;version="[2.0.4,2.1)",
-                    *</Import-Package>
-                  <Private-Package>org.apache.felix.karaf.deployer.spring</Private-Package>
+                    *
+                  </Import-Package>
                   <_versionpolicy>${bnd.version.policy}</_versionpolicy>
               </instructions>
           </configuration>

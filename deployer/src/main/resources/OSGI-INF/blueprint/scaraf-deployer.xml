@@ -27,7 +27,9 @@
     <service-properties>
       <entry key="url.handler.protocol" value="scala"/>
     </service-properties>
-    <bean class="org.fusesource.scaraf.deployer.ScalaURLHandler"/>
+    <bean class="org.fusesource.scaraf.deployer.ScalaURLHandler">
+      <property name="bundleContext" ref="blueprintBundleContext"/>
+    </bean>
   </service>
 
 </blueprint>

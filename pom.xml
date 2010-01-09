@@ -33,6 +33,7 @@
     <felix.fileinstall.version>2.0.4</felix.fileinstall.version>
     <felix.osgi.version>1.4.0</felix.osgi.version>
     <felix.plugin.version>2.0.1</felix.plugin.version>
+    <junit.version>4.7</junit.version>
     <pax.logging.version>1.4</pax.logging.version>
     <scala.version>2.7.7</scala.version>
   </properties>
@@ -90,6 +91,11 @@
         <version>${scala.version}</version>
       </dependency>
       <dependency>
+        <groupId>org.scala-lang</groupId>
+        <artifactId>scala-compiler</artifactId>
+        <version>${scala.version}</version>
+      </dependency>
+      <dependency>
         <groupId>org.ops4j.pax.logging</groupId>
         <artifactId>pax-logging-api</artifactId>
         <version>${pax.logging.version}</version>
@@ -100,6 +106,12 @@
         <artifactId>org.apache.felix.fileinstall</artifactId>
         <version>${felix.fileinstall.version}</version>
         <scope>provided</scope>
+      </dependency>
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>${junit.version}</version>
+        <scope>test</scope>
       </dependency>
     </dependencies>
   </dependencyManagement>

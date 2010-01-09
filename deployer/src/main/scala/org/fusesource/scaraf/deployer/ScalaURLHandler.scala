@@ -20,9 +20,6 @@ package org.fusesource.scaraf.deployer
 
 import java.io.ByteArrayInputStream
 import java.io.ByteArrayOutputStream
-import java.io.File
-import java.io.FileInputStream
-import java.io.FileOutputStream
 import java.io.IOException
 import java.io.InputStream
 import java.net.MalformedURLException
@@ -31,15 +28,20 @@ import java.net.URLConnection
 import org.apache.commons.logging.Log
 import org.apache.commons.logging.LogFactory
 import org.osgi.service.url.AbstractURLStreamHandlerService
+import reflect.BeanProperty
+import org.osgi.framework.BundleContext
 
 /**
- * A URL handler that will transform a Scala source file to an OSGi bundle
+ * A URL handler that will transform a Scala source file into an OSGi bundle
  * on the fly.  Needs to be registered in the OSGi registry.
  */
 class ScalaURLHandler extends AbstractURLStreamHandlerService {
   
   private var LOG: Log = LogFactory.getLog(classOf[ScalaURLHandler])
-  private var SYNTAX: String = "scala:<scala-source-uri>"
+  private var PREFIX: String = "scala:"
+  private var SYNTAX: String = PREFIX + "<scala-source-uri>"
+
+  @BeanProperty var bundleContext : BundleContext = null
 
   /**
    * Open the connection for the given URL.
@@ -60,10 +62,17 @@ class ScalaURLHandler extends AbstractURLStreamHandlerService {
 
     override def getInputStream: InputStream = {
       try {
-        var os: ByteArrayOutputStream = new ByteArrayOutputStream
-        ScalaTransformer.transform(source, os)
+        val os = new ByteArrayOutputStream
+
+        val url = if (source.toExternalForm.startsWith(PREFIX)) {
+          new URL(source.toExternalForm.substring(PREFIX.length))
+        } else {
+          source
+        }
+
+        ScalaTransformer.create(bundleContext).transform(url, os)
         os.close
-        return new ByteArrayInputStream(os.toByteArray)
+        new ByteArrayInputStream(os.toByteArray)
       }
       catch {
         case e: Exception => {
