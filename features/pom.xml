@@ -4,14 +4,14 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <parent>
     <artifactId>parent</artifactId>
-    <groupId>org.fusesource.scaraf</groupId>
+    <groupId>org.fusesource.slang</groupId>
     <version>1.0.0-SNAPSHOT</version>
   </parent>
   
   <modelVersion>4.0.0</modelVersion>
 
   <artifactId>features</artifactId>
-  <name>Scaraf :: Features</name>
+  <name>Slang :: Features</name>
 
   <build>
     <resources>

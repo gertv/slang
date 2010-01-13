@@ -21,28 +21,20 @@
 
   <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.fusesource.slang</groupId>
-  <artifactId>parent</artifactId>
+  <parent>
+    <artifactId>parent</artifactId>
+    <groupId>org.fusesource.slang</groupId>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
+
+  <artifactId>scala</artifactId>
   <packaging>pom</packaging>
   <version>1.0.0-SNAPSHOT</version>
-  <name>Slang</name>
-  <inceptionYear>2010</inceptionYear>
-
-  <properties>
-    <bnd.version.policy>[$(version;==;$(@)),$(version;+;$(@)))</bnd.version.policy>
-    <felix.fileinstall.version>2.0.4</felix.fileinstall.version>
-    <felix.osgi.version>1.4.0</felix.osgi.version>
-    <felix.plugin.version>2.0.1</felix.plugin.version>
-    <junit.version>4.7</junit.version>
-    <pax.exam.version>1.2.0</pax.exam.version>
-    <pax.logging.version>1.4</pax.logging.version>
-    <pax.swissbox.version>1.2.0</pax.swissbox.version>
-    <scala.version>2.7.7</scala.version>
-  </properties>
+  <name>Slang :: Scala</name>
 
   <modules>
-    <module>scala</module>
-    <module>features</module>
+    <module>deployer</module>
+    <module>itests</module>
   </modules>
 
   <repositories>

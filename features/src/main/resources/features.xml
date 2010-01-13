@@ -16,10 +16,10 @@
       See the License for the specific language governing permissions and
       limitations under the License.
 -->
-<features name="scaraf-${version}">
-    <feature name="scaraf" version="${version}">
+<features name="slang-${version}">
+    <feature name="slang-scala" version="${version}">
       <bundle>mvn:http://www.scala-tools.com/repo-releases!org.scala-lang-osgi/scala-library/${scala.version}</bundle>
       <bundle>mvn:http://www.scala-tools.com/repo-releases!org.scala-lang-osgi/scala-compiler/${scala.version}</bundle>
-      <bundle>mvn:org.fusesource.scaraf/org.fusesource.scaraf.deployer/${version}</bundle>
+      <bundle>mvn:org.fusesource.slang.scala/org.fusesource.slang.scala.deployer/${version}</bundle>
     </feature>
 </features>
