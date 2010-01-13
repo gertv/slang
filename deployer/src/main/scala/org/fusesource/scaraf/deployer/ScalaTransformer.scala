@@ -19,29 +19,44 @@ package org.fusesource.scaraf.deployer
 import archiver.ScalaArchiver
 import compiler.{Bundles, ScalaCompiler}
 import org.apache.commons.logging.LogFactory
-import java.io.{File, OutputStream}
 import tools.nsc.io.{PlainFile, AbstractFile}
 import java.net.URL
 import org.osgi.framework.{BundleContext, Bundle}
+import java.io.{InputStream, File, OutputStream}
 
 /**
- *
+ * 
  */
 class ScalaTransformer(val context: BundleContext) {
 
   final val LOG = LogFactory.getLog(classOf[ScalaTransformer])
 
   val compiler = if (context == null) {
-    new ScalaCompiler(new Array[AbstractFile](0))
+    new ScalaCompiler(List() : List[AbstractFile])
   } else {
-    new ScalaCompiler(Bundles.create(context.getBundles))
+    val framework = context.getProperty("karaf.framework")
+    val jar = new File(context.getProperty("karaf.base"), context.getProperty("karaf.framework." + framework))
+
+    new ScalaCompiler(AbstractFile.getDirectory(jar) :: Bundles.create(context.getBundles))
   }
 
-  val archiver = new ScalaArchiver
+  val archiver = new ScalaArchiver 
 
-  def transform(url: URL, stream: OutputStream) = {
+  def transform(url: URL, stream: OutputStream) : Unit = {
+    val result = transform(url)
+    val bytes = new Array[Byte](1024)
+    var read = result.read(bytes)
+    while (read > 0) {
+      stream.write(bytes, 0, read)
+      read = result.read(bytes)
+    }
+    result.close
+  }
+
+  def transform(url: URL) : InputStream = {
     LOG.info("Transforming " + url + " into an OSGi bundle")
-    archiver.archive(compile(url), stream)
+    println(url.getPath + url.getFile)
+    archiver.archive(compile(url))
   }
 
   def compile(url: URL) = compiler.compile(files(url))

@@ -30,6 +30,9 @@ import org.apache.commons.logging.LogFactory
 import org.osgi.service.url.AbstractURLStreamHandlerService
 import reflect.BeanProperty
 import org.osgi.framework.BundleContext
+import org.ops4j.pax.swissbox.bnd.BndUtils.createBundle
+import java.util.Properties
+import org.ops4j.pax.swissbox.bnd.OverwriteMode.MERGE
 
 /**
  * A URL handler that will transform a Scala source file into an OSGi bundle
@@ -62,21 +65,19 @@ class ScalaURLHandler extends AbstractURLStreamHandlerService {
 
     override def getInputStream: InputStream = {
       try {
-        val os = new ByteArrayOutputStream
-
         val url = if (source.toExternalForm.startsWith(PREFIX)) {
           new URL(source.toExternalForm.substring(PREFIX.length))
         } else {
           source
         }
 
-        ScalaTransformer.create(bundleContext).transform(url, os)
-        os.close
-        new ByteArrayInputStream(os.toByteArray)
+        ScalaTransformer.create(bundleContext).transform(url)
+
+
       }
       catch {
         case e: Exception => {
-          LOG.error("Error opening spring xml url", e)
+          LOG.error("Error creating bundle from Scala source code", e)
           throw new IOException("Error opening spring xml url").initCause(e).asInstanceOf[IOException]
         }
       }

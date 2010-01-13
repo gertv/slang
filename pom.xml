@@ -34,13 +34,16 @@
     <felix.osgi.version>1.4.0</felix.osgi.version>
     <felix.plugin.version>2.0.1</felix.plugin.version>
     <junit.version>4.7</junit.version>
+    <pax.exam.version>1.2.0</pax.exam.version>
     <pax.logging.version>1.4</pax.logging.version>
+    <pax.swissbox.version>1.2.0</pax.swissbox.version>
     <scala.version>2.7.7</scala.version>
   </properties>
 
   <modules>
     <module>deployer</module>
     <module>features</module>
+    <module>itests</module>
   </modules>
 
   <repositories>
@@ -86,12 +89,12 @@
         <scope>provided</scope>
       </dependency>
       <dependency>
-        <groupId>org.scala-lang</groupId>
+        <groupId>org.scala-lang-osgi</groupId>
         <artifactId>scala-library</artifactId>
         <version>${scala.version}</version>
       </dependency>
       <dependency>
-        <groupId>org.scala-lang</groupId>
+        <groupId>org.scala-lang-osgi</groupId>
         <artifactId>scala-compiler</artifactId>
         <version>${scala.version}</version>
       </dependency>
@@ -108,9 +111,34 @@
         <scope>provided</scope>
       </dependency>
       <dependency>
+        <groupId>org.ops4j.pax.swissbox</groupId>
+        <artifactId>pax-swissbox-bnd</artifactId>
+        <version>1.2.0</version>
+      </dependency>
+
+      <!-- test-only dependencies -->
+      <dependency>
         <groupId>junit</groupId>
         <artifactId>junit</artifactId>
         <version>${junit.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.ops4j.pax.exam</groupId>
+        <artifactId>pax-exam</artifactId>
+        <version>${pax.exam.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.ops4j.pax.exam</groupId>
+        <artifactId>pax-exam-container-default</artifactId>
+        <version>${pax.exam.version}</version>
+        <scope>test</scope>
+      </dependency>
+      <dependency>
+        <groupId>org.ops4j.pax.exam</groupId>
+        <artifactId>pax-exam-junit</artifactId>
+        <version>${pax.exam.version}</version>
         <scope>test</scope>
       </dependency>
     </dependencies>

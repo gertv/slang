@@ -21,11 +21,11 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.scala-lang</groupId>
+      <groupId>org.scala-lang-osgi</groupId>
       <artifactId>scala-library</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.scala-lang</groupId>
+      <groupId>org.scala-lang-osgi</groupId>
       <artifactId>scala-compiler</artifactId>
     </dependency>    
     <dependency>
@@ -35,6 +35,11 @@
     <dependency>
       <groupId>org.apache.felix</groupId>
       <artifactId>org.apache.felix.fileinstall</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.ops4j.pax.swissbox</groupId>
+      <artifactId>pax-swissbox-bnd</artifactId>
+      <optional>true</optional>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
@@ -92,6 +97,8 @@
                     *
                   </Import-Package>
                   <_versionpolicy>${bnd.version.policy}</_versionpolicy>
+                  <Embed-Dependency>pax-swissbox-bnd,bndlib,ops4j-base-lang</Embed-Dependency>
+                  <Embed-Transitive>true</Embed-Transitive>
               </instructions>
           </configuration>
       </plugin>      

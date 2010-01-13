@@ -17,8 +17,15 @@
 package org.fusesource.scaraf.deployer.archiver
 
 import tools.nsc.io.AbstractFile
-import java.io.OutputStream
-import java.util.jar.{JarEntry, JarOutputStream}
+import tools.nsc.interpreter.AbstractFileClassLoader
+import org.osgi.framework.BundleActivator
+import java.util.jar.JarFile.MANIFEST_NAME
+import java.util.jar.{Attributes, Manifest, JarEntry, JarOutputStream}
+import java.io.{ByteArrayOutputStream, ByteArrayInputStream, InputStream, OutputStream}
+import org.ops4j.pax.swissbox.bnd.BndUtils.createBundle
+
+import java.util.Properties
+import org.apache.commons.logging.LogFactory
 
 /**
  * Helper class that stores the contents of a Scala compile {@link AbstractFile}
@@ -26,23 +33,49 @@ import java.util.jar.{JarEntry, JarOutputStream}
  */
 class ScalaArchiver {
 
-  def archive(dir: AbstractFile, stream: OutputStream) {
-    val jar = new JarOutputStream(stream)
-    archiveDir(dir, jar)
+  val LOG = LogFactory.getLog(classOf[ScalaArchiver])
+
+  def archive(dir: AbstractFile) : InputStream = {
+    val classloader = new AbstractFileClassLoader(dir, getClass().getClassLoader)
+
+    val props = new Properties
+
+    val bytes = new ByteArrayOutputStream
+    val jar = new JarOutputStream(bytes)
+    entries(dir) { (name: String, file: AbstractFile) =>
+      archiveFile(file, jar, name)
+      try {
+        val theType = classloader.loadClass(name.replaceAll(".class", "").replaceAll("/", "."))
+        if (classOf[BundleActivator].isAssignableFrom(theType)) {
+          LOG.debug("Discovered bundle activator " + theType.getName)
+          props.put("Bundle-Activator", theType.getName)
+        }
+      } catch {
+        case e: Exception => e.printStackTrace
+      }
+
+    }
+
     jar.close
+    bytes.close
+
+    createBundle(new ByteArrayInputStream(bytes.toByteArray),
+                 props,
+                 "some name")
   }
     
-  def archiveDir(dir: AbstractFile, jar: JarOutputStream) : Unit = archiveDir(dir, jar, "")
+  def entries(dir: AbstractFile)(action: (String, AbstractFile) => Unit) : Unit = 
+    entries(dir, "")(action)
 
-  def archiveDir(dir: AbstractFile, jar: JarOutputStream, path:String) : Unit = {
+  def entries(dir: AbstractFile, path:String)(action: (String, AbstractFile) => Unit) : Unit = {
     dir.foreach { (file: AbstractFile) =>
       val name = if (path.length == 0) { file.name } else { path + "/" + file.name }
       if (file.isDirectory) {
-        archiveDir(file, jar, name)
+        entries(file, name)(action)
       } else {
-        archiveFile(file, jar, name)
+        action(name, file)
       }
-    }
+    }    
   }
 
   def archiveFile(file: AbstractFile, jar: JarOutputStream, name: String) = {
@@ -52,7 +85,7 @@ class ScalaArchiver {
     val is = file.input
     var read = is.read(bytes)
     while (read > 0) {
-      jar.write(bytes)
+      jar.write(bytes, 0, read)
       read = is.read(bytes)
     }
     jar.closeEntry

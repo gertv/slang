@@ -34,8 +34,8 @@ object Bundles {
    * Create an array of {@link AbstractFile}s for a given array of bundles.
    * If a bundle has a file: URL, a {@PlainFile} is being used, otherwise w
    */
-  def create(bundles: Array[Bundle]) : Array[AbstractFile] = {
-    val result = new Array[AbstractFile](bundles.length)
+  def create(bundles: Array[Bundle]) : List[AbstractFile] = {
+    var result : List[AbstractFile] = List()
     for (val bundle <- bundles; val index = bundles.indexOf(bundle)) {
         var url = bundle.getResource("/");
         if (url == null) {
@@ -45,18 +45,18 @@ object Bundles {
         if (url != null) {
             if ("file" == url.getProtocol()) {
                 try {
-                    result(index) = new PlainFile(new File(url.toURI()));
+                    result += new PlainFile(new File(url.toURI()));
                 }
                 catch {
                   case e: URISyntaxException => throw new IllegalArgumentException("Can't determine url of bundle " + bundle, e);
                 }
             }
             else {
-                result(index) = Bundles.create(bundle);
+                result += Bundles.create(bundle);
             }
         }
         else {
-            LOG.warn("Cannot retreive resources from Bundle. Skipping" + bundle.getSymbolicName());
+            LOG.warn("Cannot retreive resources from Bundle. Skipping " + bundle.getSymbolicName());
         }
     }
     result;

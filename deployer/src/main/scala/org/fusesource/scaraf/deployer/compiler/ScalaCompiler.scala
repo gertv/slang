@@ -28,7 +28,7 @@ import tools.nsc.io.{PlainFile, AbstractFile}
  * Scala compiler that uses a provided list of bundles as the compiler
  * classpath
  */
-class ScalaCompiler(bundles: Array[AbstractFile]) {
+class ScalaCompiler(bundles: List[AbstractFile]) {
 
   final val LOG = LogFactory.getLog(classOf[ScalaCompiler])
 
@@ -66,7 +66,7 @@ class ScalaCompiler(bundles: Array[AbstractFile]) {
       require(!forMSIL, "MSIL not supported")
       new classPath0.BuildClasspath(settings.classpath.value, settings.sourcepath.value,
         settings.outdir.value, settings.bootclasspath.value, settings.extdirs.value,
-        settings.Xcodebase.value, bundles)
+        settings.Xcodebase.value, bundles.toArray[AbstractFile])
     }
   }
 

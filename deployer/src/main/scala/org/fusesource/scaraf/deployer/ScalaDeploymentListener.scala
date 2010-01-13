@@ -36,8 +36,7 @@ class ScalaDeploymentListener extends ArtifactUrlTransformer {
 
   def transform(artifact: URL) : URL = {
     try {
-        val scala = new URL("scala", null, artifact.toString());
-        new URL("wrap", null, scala.toString)
+        new URL("scala", null, artifact.toString());
     } catch {
       case e: Exception => {
         LOG.error("Unable to build scala bundle", e);
