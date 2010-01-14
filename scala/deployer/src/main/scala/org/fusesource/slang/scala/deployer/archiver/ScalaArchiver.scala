@@ -32,12 +32,14 @@ import java.net.URL
  * Helper class that stores the contents of a Scala compile {@link AbstractFile}
  * to an output (packed as a JAR file)
  */
-class ScalaArchiver {
+class ScalaArchiver(bundles: List[AbstractFile]) {
 
   val LOG = LogFactory.getLog(classOf[ScalaArchiver])
 
+  val classloaders = bundles.map(new AbstractFileClassLoader(_, getClass.getClassLoader))
+
   def archive(dir: AbstractFile, url: URL) : InputStream = {
-    val classloader = new AbstractFileClassLoader(dir, getClass().getClassLoader)
+    val classloader = createClassLoader(dir)
 
     val props = new Properties
 
@@ -100,5 +102,31 @@ class ScalaArchiver {
       result = result.substring(1)
     }
     result.replaceAll("/", ".")      
+  }
+
+  def createClassLoader(dir: AbstractFile) = new AbstractFileClassLoader(dir, getClass.getClassLoader) {
+    override def findClass(name: String) : Class[_] = {
+      try {
+        // let's try the bundle we're generating first
+        super.findClass(name)
+      } catch {
+        // and then fall back to the rest of the bundles
+        case e: ClassNotFoundException => findClassInBundles(name)
+      }
+    }
+
+    def findClassInBundles(name: String) : Class[_] = {
+      classloaders.map(cl => findClass(name, cl)).find(cls => cls.isDefined) match {
+        case Some(cls) => cls.get
+        case None => throw new ClassNotFoundException(name)
+      }
+    }
+
+    def findClass(name: String, loader: AbstractFileClassLoader) =
+      try {
+       Some(loader.findClass(name))
+      } catch {
+       case e: ClassNotFoundException => None
+      }
   }
 }

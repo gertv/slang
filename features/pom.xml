@@ -13,6 +13,24 @@
   <artifactId>features</artifactId>
   <name>Slang :: Features</name>
 
+  <dependencies>
+    <dependency>
+      <groupId>org.osgi</groupId>
+      <artifactId>org.osgi.core</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.ops4j.pax.logging</groupId>
+      <artifactId>pax-logging-api</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.felix</groupId>
+      <artifactId>org.apache.felix.fileinstall</artifactId>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>  
+
   <build>
     <resources>
       <resource>
@@ -24,6 +42,27 @@
       </resource>
     </resources>
     <plugins>
+      <plugin>
+        <groupId>org.apache.felix.karaf.tooling</groupId>
+        <artifactId>features-maven-plugin</artifactId>
+        <version>${karaf.version}</version>
+        <executions>
+          <execution>
+            <id>validate</id>
+            <phase>process-resources</phase>
+            <goals>
+              <goal>validate</goal>
+            </goals>
+          </execution>
+        </executions>
+        <dependencies>
+          <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-simple</artifactId>
+            <version>1.4.3</version>
+          </dependency>
+        </dependencies>
+      </plugin>
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>

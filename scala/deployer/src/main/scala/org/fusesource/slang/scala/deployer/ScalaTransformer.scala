@@ -31,16 +31,17 @@ class ScalaTransformer(val context: BundleContext) {
 
   final val LOG = LogFactory.getLog(classOf[ScalaTransformer])
 
-  val compiler = if (context == null) {
-    new ScalaCompiler(List() : List[AbstractFile])
+  val bundles : List[AbstractFile] = if (context == null) {
+    List()
   } else {
     val framework = context.getProperty("karaf.framework")
     val jar = new File(context.getProperty("karaf.base"), context.getProperty("karaf.framework." + framework))
-
-    new ScalaCompiler(AbstractFile.getDirectory(jar) :: Bundles.create(context.getBundles))
+    AbstractFile.getDirectory(jar) :: Bundles.create(context.getBundles)
   }
 
-  val archiver = new ScalaArchiver 
+  val compiler = new ScalaCompiler(bundles)
+
+  val archiver = new ScalaArchiver(bundles) 
 
   def transform(url: URL, stream: OutputStream) : Unit = {
     val result = transform(url)
