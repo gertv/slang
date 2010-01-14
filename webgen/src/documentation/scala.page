@@ -88,3 +88,49 @@ karaf@root> osgi:headers 35
 Export-Package = org.fusesource.slang.scala.example;uses:=scala
 ----
 
+
+== Adding a BundleActivator
+
+Slang(Scala) will automatically discover a org.osgi.framework.BundleActivator implementation in your Scala file and set it as the activator for the compiled bundle.
+
+=== Create the Scala file
+
+Let's create a second Scala file in our deploy directory, now with a BundleActivator in it.
+
+----
+import org.osgi.framework.{BundleContext,BundleActivator}
+
+package org.fusesource.slang.scala.activator {
+
+  class MyActivator extends BundleActivator {
+
+    def start(context: BundleContext) = println("Starting the bundle")
+
+    def stop(context: BundleContext) = println("Stopping the bundle")
+
+  }
+
+}
+----
+
+As soon as you save the file, it gets compiled and you'll see the "Starting the bundle" message appear in the console.
+
+=== Looking at the generated bundle
+
+If you now do osgi:headers on the newly generated bundle, you'll see the BundleActivator class in the OSGi headers:
+
+----
+karaf@root> osgi:headers 37
+...
+Bundle-Activator = org.fusesource.slang.scala.activator.MyActivator
+...
+----
+
+Stopping and starting the bundle again will also show the messages on the console again:
+
+----
+karaf@root> osgi:stop 37
+Stopping the bundle
+karaf@root> osgi:start 37
+Starting the bundle
+----
