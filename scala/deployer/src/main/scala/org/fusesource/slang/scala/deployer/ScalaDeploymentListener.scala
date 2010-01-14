@@ -30,7 +30,6 @@ class ScalaDeploymentListener extends ArtifactUrlTransformer {
   val LOG = LogFactory.getLog(classOf[ScalaDeploymentListener])
 
   def canHandle(artifact: File) = {
-    LOG.info("Can we handle " + artifact.getAbsolutePath)
     artifact.isFile() && artifact.getName().endsWith(".scala")
   }
 
