@@ -30,7 +30,7 @@ The best way to get the Scala support for Slang is currently by link:/source.htm
 Install the slang-scala feature on Karaf by running these commands from the Karaf console:
 
 ----
-features:add mvn:org.fusesource.slang/features/1.0.0-SNAPSHOT/xml/features
+features:addUrl mvn:org.fusesource.slang/features/1.0.0-SNAPSHOT/xml/features
 features:install slang-scala
 ----
 
