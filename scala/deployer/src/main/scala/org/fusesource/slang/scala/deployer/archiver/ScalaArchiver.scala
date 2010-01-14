@@ -26,6 +26,7 @@ import org.ops4j.pax.swissbox.bnd.BndUtils.createBundle
 
 import java.util.Properties
 import org.apache.commons.logging.LogFactory
+import java.net.URL
 
 /**
  * Helper class that stores the contents of a Scala compile {@link AbstractFile}
@@ -35,7 +36,7 @@ class ScalaArchiver {
 
   val LOG = LogFactory.getLog(classOf[ScalaArchiver])
 
-  def archive(dir: AbstractFile) : InputStream = {
+  def archive(dir: AbstractFile, url: URL) : InputStream = {
     val classloader = new AbstractFileClassLoader(dir, getClass().getClassLoader)
 
     val props = new Properties
@@ -60,8 +61,7 @@ class ScalaArchiver {
     bytes.close
 
     createBundle(new ByteArrayInputStream(bytes.toByteArray),
-                 props,
-                 "some name")
+                 props, bsn(url))
   }
     
   def entries(dir: AbstractFile)(action: (String, AbstractFile) => Unit) : Unit = 
@@ -89,5 +89,16 @@ class ScalaArchiver {
       read = is.read(bytes)
     }
     jar.closeEntry
+  }
+
+  def bsn(url: URL) = {
+    var result = url.getPath
+    if (result.endsWith(".scala")) {
+      result = result.substring(0, result.length - 6)
+    }
+    if (result.startsWith("/")) {
+      result = result.substring(1)
+    }
+    result.replaceAll("/", ".")      
   }
 }

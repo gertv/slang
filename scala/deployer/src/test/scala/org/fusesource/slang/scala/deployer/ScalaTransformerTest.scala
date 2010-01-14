@@ -69,6 +69,8 @@ class ScalaTransformerTest {
     val manifest = jar.getManifest;
     assertEquals("BundleActivator class should have been automatically detected",
                  "org.test.TestWithActivator", manifest.getMainAttributes.getValue("Bundle-Activator"))
+    assertTrue("Bundle-SymbolicName should have a decent value",
+               manifest.getMainAttributes().getValue("Bundle-SymbolicName").endsWith("TestWithActivator"));
   }
 
 

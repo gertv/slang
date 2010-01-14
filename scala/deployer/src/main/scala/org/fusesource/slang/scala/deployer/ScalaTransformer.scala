@@ -55,8 +55,7 @@ class ScalaTransformer(val context: BundleContext) {
 
   def transform(url: URL) : InputStream = {
     LOG.info("Transforming " + url + " into an OSGi bundle")
-    println(url.getPath + url.getFile)
-    archiver.archive(compile(url))
+    archiver.archive(compile(url), url)
   }
 
   def compile(url: URL) = compiler.compile(files(url))
