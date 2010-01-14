@@ -45,28 +45,6 @@
     <module>features</module>
   </modules>
 
-  <repositories>
-    <repository>
-      <id>scala-tools.org</id>
-      <name>Scala-Tools Maven2 Repository</name>
-      <url>http://scala-tools.org/repo-releases</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
-
-  <pluginRepositories>
-    <pluginRepository>
-      <id>scala-tools.org</id>
-      <name>Scala-Tools Maven2 Repository</name>
-      <url>http://scala-tools.org/repo-releases</url>
-      <snapshots>
-        <enabled>false</enabled>
-      </snapshots>      
-    </pluginRepository>
-  </pluginRepositories>
-
   <build>
     <defaultGoal>install</defaultGoal>
     <plugins>
@@ -86,16 +64,6 @@
         <artifactId>org.osgi.core</artifactId>
         <version>${felix.osgi.version}</version>
         <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.scala-lang-osgi</groupId>
-        <artifactId>scala-library</artifactId>
-        <version>${scala.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.scala-lang-osgi</groupId>
-        <artifactId>scala-compiler</artifactId>
-        <version>${scala.version}</version>
       </dependency>
       <dependency>
         <groupId>org.ops4j.pax.logging</groupId>

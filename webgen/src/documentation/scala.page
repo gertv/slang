@@ -1,0 +1,90 @@
+---
+title: Slang Scala User Guide
+--- name:head pipeline:tags
+<link href="{relocatable: /styles/book.css}" rel="stylesheet" type="text/css" />
+
+--- name:content pipeline:tags,asciidoc
+
+{title:}
+====================
+Gert Vanthienen
+:Author Initials: gertv
+{project_version:}, 2010
+
+Slang(Scala) allows you to deploy Scala source files directly on link:http://felix.apache.org/site/apache-felix-karaf.html[Apache Felix Karaf]
+
+== Installing Slang(Scala) on Karaf
+
+Before you can get started with Slang's Scala support
+
+=== Requirements
+
+* Apache Felix Karaf 1.2.0
+
+=== Build
+
+The best way to get the Scala support for Slang is currently by link:/source.html[getting the source code] and link:/building.html[building it]
+
+=== Install on Karaf
+
+Install the slang-scala feature on Karaf by running these commands from the Karaf console:
+
+----
+features:add mvn:org.fusesource.slang/features/1.0.0-SNAPSHOT/xml/features
+features:install slang-scala
+----
+
+You can verify that the feature was installed correctly by running the osgi:list command
+
+----
+karaf@root> osgi:list
+START LEVEL 100
+   ID   State         Blueprint      Level  Name
+...
+[  31] [Active     ] [Created     ] [   20] Apache Geronimo Blueprint Bundle (1.0.0)
+[  32] [Active     ] [            ] [   60] scala-library (2.7.7)
+[  33] [Active     ] [            ] [   60] scala-compiler (2.7.7)
+----
+
+== Deploy your first Scala file
+
+[[CreateScalaFile]]
+=== Create the Scala file
+
+Now you're ready to deploy your first Scala file.  In the Karaf deploy folder, create a file name hello.scala
+
+----
+package org.fusesource.slang.scala.example {
+
+class HelloWorld {
+  // this class doesn't do anything yet
+  // just making sure deployment works fine
+}
+
+}
+----
+
+The source file will automatically get compiled, transformed into an OSGi bundled and deployed.
+
+[[VerifyDeployment]]
+=== Verify the deployment
+
+To make sure everything went OK, run osgi:list again:
+
+----
+karaf@root> osgi:list
+START LEVEL 100
+   ID   State         Blueprint      Level  Name
+...
+[  35] [Active     ] [            ] [   60] some_name (0)
+----
+
+Now that you know the bundle id of the deployed scala file, you can also take a closer look at the OSGi bundle headers.
+You'll notice the bundle exports the org.fusesource.slang.scala.example package we defined in the source file.
+
+----
+karaf@root> osgi:headers 35
+...
+Export-Package = org.fusesource.slang.scala.example;uses:=scala
+----
+
