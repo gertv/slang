@@ -21,7 +21,7 @@ import org.osgi.framework.BundleContext
 import org.junit.Test
 import org.junit.Assert.{assertNotNull}
 import org.ops4j.pax.exam.Inject
-import org.ops4j.pax.exam.CoreOptions.{options, mavenBundle, systemProperties, systemProperty, bootDelegationPackage}
+import org.ops4j.pax.exam.CoreOptions.{options, mavenBundle, systemProperties, systemProperty, bootDelegationPackage, provision}
 import org.ops4j.pax.exam.junit.{Configuration, JUnit4TestRunner}
 import java.util.jar.JarInputStream
 import java.io.{FileOutputStream, ByteArrayInputStream, ByteArrayOutputStream}
@@ -30,7 +30,7 @@ import java.io.{FileOutputStream, ByteArrayInputStream, ByteArrayOutputStream}
  * Skeleton class for starting to build more extensive integration tests
  */
 @RunWith(classOf[JUnit4TestRunner])
-class ScalaTransformerIntegrationTest {
+class ScalaTransformerIntegration {
 
     @Inject
     var context: BundleContext = null 
@@ -47,11 +47,10 @@ class ScalaTransformerIntegrationTest {
   def configuration: Array[org.ops4j.pax.exam.Option] = {
     println("Configuring")
     options(
-      bootDelegationPackage("org.fusesource.scala.slang.deployer"),
+      provision("scan-features:mvn:org.fusesource.slang/features/1.0.0-SNAPSHOT/xml/features"),
       systemProperties(
         systemProperty("org.ops4j.pax.url.mvn.repositories").value("http://www.scala-tools.com/repo-releases"),
         systemProperty("org.ops4j.pax.url.mvn.defaultRepositories").value("http://www.scala-tools.com/repo-releases")
       ),
-      mavenBundle.groupId("org.scala-lang-osgi").artifactId("scala-library").version("2.7.7")
   )}
 }

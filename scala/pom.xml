@@ -35,6 +35,7 @@
   <modules>
     <module>deployer</module>
     <module>itests</module>
+    <module>common</module>
   </modules>
 
   <repositories>
@@ -47,6 +48,13 @@
       </snapshots>
     </repository>
   </repositories>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.scala-lang</groupId>
+      <artifactId>scala-compiler</artifactId>
+    </dependency>        
+  </dependencies>
 
   <pluginRepositories>
     <pluginRepository>
@@ -61,7 +69,24 @@
 
   <build>
     <defaultGoal>install</defaultGoal>
+    <sourceDirectory>src/main/scala</sourceDirectory>
+    <testSourceDirectory>src/test/scala</testSourceDirectory>
     <plugins>
+      <plugin>
+        <groupId>org.scala-tools</groupId>
+        <artifactId>maven-scala-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>compile</goal>
+              <goal>testCompile</goal>
+            </goals>
+          </execution>
+        </executions>
+        <configuration>
+          <scalaVersion>${scala.version}</scalaVersion>
+        </configuration>
+      </plugin>
       <plugin>
           <groupId>org.apache.felix</groupId>
           <artifactId>maven-bundle-plugin</artifactId>
@@ -70,7 +95,7 @@
       </plugin>      
     </plugins>
   </build>
-
+  
   <dependencyManagement>
     <dependencies>
       <dependency>
@@ -82,6 +107,11 @@
         <groupId>org.scala-lang</groupId>
         <artifactId>scala-compiler</artifactId>
         <version>${scala.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.scalamodules</groupId>
+        <artifactId>scalamodules.core</artifactId>
+        <version>${scalamodules.version}</version>
       </dependency>
     </dependencies>
   </dependencyManagement>

@@ -35,6 +35,7 @@
     <felix.plugin.version>2.0.1</felix.plugin.version>
     <junit.version>4.7</junit.version>
     <karaf.version>1.2.0</karaf.version>
+    <osgi.version>4.2.0</osgi.version>
     <pax.exam.version>1.2.0</pax.exam.version>
     <pax.logging.version>1.4</pax.logging.version>
     <pax.swissbox.version>1.2.0</pax.swissbox.version>
@@ -82,6 +83,11 @@
         <groupId>org.ops4j.pax.swissbox</groupId>
         <artifactId>pax-swissbox-bnd</artifactId>
         <version>1.2.0</version>
+      </dependency>
+      <dependency>
+        <groupId>org.osgi</groupId>
+        <artifactId>org.osgi.core</artifactId>
+        <version>${osgi.version}</version>
       </dependency>
 
       <!-- test-only dependencies -->
