@@ -45,24 +45,7 @@
   </dependencies>
 
   <build>
-    <sourceDirectory>src/main/scala</sourceDirectory>
-    <testSourceDirectory>src/test/scala</testSourceDirectory>
     <plugins>
-      <plugin>
-        <groupId>org.scala-tools</groupId>
-        <artifactId>maven-scala-plugin</artifactId>
-        <executions>
-          <execution>
-            <goals>
-              <goal>compile</goal>
-              <goal>testCompile</goal>
-            </goals>
-          </execution>
-        </executions>
-        <configuration>
-          <scalaVersion>${scala.version}</scalaVersion>
-        </configuration>
-      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-eclipse-plugin</artifactId>
@@ -90,7 +73,6 @@
                   <Import-Package>
                     !${pom.artifactId}*,
                     org.apache.commons.logging;version="[1.1, 1.2)",
-                    org.apache.felix.fileinstall*;version="[2.0.4,2.1)",
                     *
                   </Import-Package>
                   <_versionpolicy>${bnd.version.policy}</_versionpolicy>
@@ -107,9 +89,6 @@
       <plugin>
         <groupId>org.scala-tools</groupId>
         <artifactId>maven-scala-plugin</artifactId>
-        <configuration>
-          <scalaVersion>${scala.version}</scalaVersion>
-        </configuration>
       </plugin>
     </plugins>
   </reporting>

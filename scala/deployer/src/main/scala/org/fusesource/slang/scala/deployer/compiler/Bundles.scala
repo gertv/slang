@@ -18,9 +18,10 @@ package org.fusesource.slang.scala.deployer.compiler
 
 import org.osgi.framework.Bundle
 import java.io.{InputStream, IOException, File}
-import tools.nsc.io.{PlainFile, AbstractFile}
+import scala.tools.nsc.io.{PlainFile, AbstractFile}
 import java.net.{URISyntaxException, URL}
 import org.apache.commons.logging.LogFactory
+import java.lang.String
 
 /**
  * Helper methods to transform OSGi bundles into {@link AbstractFile} implementations
@@ -36,7 +37,7 @@ object Bundles {
    */
   def create(bundles: Array[Bundle]) : List[AbstractFile] = {
     var result : List[AbstractFile] = List()
-    for (val bundle <- bundles; val index = bundles.indexOf(bundle)) {
+    for (bundle <- bundles; val index = bundles.indexOf(bundle)) {
         var url = bundle.getResource("/");
         if (url == null) {
             url = bundle.getResource("");
@@ -45,14 +46,14 @@ object Bundles {
         if (url != null) {
             if ("file" == url.getProtocol()) {
                 try {
-                    result += new PlainFile(new File(url.toURI()));
+                    result = new PlainFile(new File(url.toURI())) :: result;
                 }
                 catch {
                   case e: URISyntaxException => throw new IllegalArgumentException("Can't determine url of bundle " + bundle, e);
                 }
             }
             else {
-                result += Bundles.create(bundle);
+                result = Bundles.create(bundle) :: result;
             }
         }
         else {
@@ -128,7 +129,7 @@ object Bundles {
        */
       def isDirectory: Boolean = true
 
-      def elements: Iterator[AbstractFile] = {
+      override def elements: Iterator[AbstractFile] = {
         new Iterator[AbstractFile]() {
           val dirs = bundle.getEntryPaths(fullName)
           var nextEntry = prefetch()
@@ -196,6 +197,14 @@ object Bundles {
         }
       }
 
+      override def lookupPathUnchecked(path: String, directory: Boolean) = lookupPath(path, directory)
+      def lookupNameUnchecked(name: String, directory: Boolean) = lookupName(path, directory)
+
+      def iterator = elements
+
+      def absolute = unsupported("absolute() is unsupported")
+      def create = unsupported("create() is unsupported")
+      def delete = unsupported("create() is unsupported")
     }
 
     class FileEntry(url: URL, parent: DirEntry) extends BundleEntry(url, parent) {
@@ -205,8 +214,17 @@ object Bundles {
        */
       def isDirectory: Boolean = false
       override def sizeOption: Option[Int] = Some(bundle.getEntry(fullName).openConnection().getContentLength())
-      def elements: Iterator[AbstractFile] = Iterator.empty
+      override def elements: Iterator[AbstractFile] = Iterator.empty
       def lookupName(name: String, directory: Boolean): AbstractFile = null
+
+      override def lookupPathUnchecked(path: String, directory: Boolean) = lookupPath(path, directory)
+      def lookupNameUnchecked(name: String, directory: Boolean) = lookupName(path, directory)
+
+      def iterator = elements
+
+      def absolute = unsupported("absolute() is unsupported")
+      def create = unsupported("create() is unsupported")
+      def delete = unsupported("create() is unsupported")      
     }
 
     new DirEntry(bundle.getResource("/"), null)

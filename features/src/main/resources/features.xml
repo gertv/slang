@@ -19,8 +19,8 @@
 <features name="slang-${version}">
     <feature name="slang-scala" version="${version}">
       <!-- everything for the deployer -->
-      <bundle>mvn:http://www.scala-tools.org/repo-releases!org.scala-lang-osgi/scala-library/${scala.version}</bundle>
-      <bundle>mvn:http://www.scala-tools.org/repo-releases!org.scala-lang-osgi/scala-compiler/${scala.version}</bundle>
+      <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.scala-library/${scala.version}_1-SNAPSHOT</bundle>
+      <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.scala-compiler/${scala.version}_1-SNAPSHOT</bundle>
       <bundle>mvn:org.fusesource.slang.scala/org.fusesource.slang.scala.deployer/${version}</bundle>
       <!-- common -->
       <bundle>mvn:org.fusesource.slang.scala/org.fusesource.slang.scala.common/${version}</bundle>

@@ -19,7 +19,7 @@ Before you can get started with Slang's Scala support
 
 === Requirements
 
-* Apache Felix Karaf 1.2.0
+* Apache Felix Karaf 2.0.0
 
 === Build
 
@@ -39,11 +39,13 @@ You can verify that the feature was installed correctly by running the osgi:list
 ----
 karaf@root> osgi:list
 START LEVEL 100
-   ID   State         Blueprint      Level  Name
+   ID   State         Blueprint      Spring    Level  Name
 ...
-[  31] [Active     ] [Created     ] [   20] Apache Geronimo Blueprint Bundle (1.0.0)
-[  32] [Active     ] [            ] [   60] scala-library (2.7.7)
-[  33] [Active     ] [            ] [   60] scala-compiler (2.7.7)
+[  31] [Active     ] [Created     ] [       ] [   20] Apache Geronimo Blueprint Bundle (1.0.0)
+[  32] [Active     ] [            ] [       ] [   60] Apache ServiceMix Bundles: scala-library-2.8.0 (2.8.0.SNAPSHOT)
+[  33] [Active     ] [            ] [       ] [   60] Apache ServiceMix Bundles: scala-compiler-2.8.0 (2.8.0.SNAPSHOT)
+[  34] [Active     ] [Created     ] [       ] [   60] Slang :: Scala :: Deployer (1.0.0.SNAPSHOT)
+[  35] [Active     ] [            ] [       ] [   60] Slang :: Scala :: Common (1.0.0.SNAPSHOT)
 ----
 
 == Deploy your first Scala file

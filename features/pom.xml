@@ -20,6 +20,11 @@
       <scope>provided</scope>
     </dependency>
     <dependency>
+      <groupId>org.apache.aries.blueprint</groupId>
+      <artifactId>org.apache.aries.blueprint</artifactId>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
       <groupId>org.ops4j.pax.logging</groupId>
       <artifactId>pax-logging-api</artifactId>
       <scope>provided</scope>
@@ -43,7 +48,7 @@
     </resources>
     <plugins>
       <plugin>
-        <groupId>org.apache.felix.karaf.tooling</groupId>
+        <groupId>org.apache.karaf.tooling</groupId>
         <artifactId>features-maven-plugin</artifactId>
         <version>${karaf.version}</version>
         <executions>

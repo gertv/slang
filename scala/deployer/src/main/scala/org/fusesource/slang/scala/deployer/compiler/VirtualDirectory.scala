@@ -26,7 +26,7 @@ package org.fusesource.slang.scala.deployer.compiler {
  *
  * NSC -- new Scala compiler
  * Copyright 2005-2009 LAMP/EPFL
- */
+
 class VirtualDirectory(val name: String, maybeContainer: Option[VirtualDirectory]) extends AbstractFile {
 
   def path: String =
@@ -83,5 +83,6 @@ class VirtualDirectory(val name: String, maybeContainer: Option[VirtualDirectory
     }
   }
 }
+*/
 
 }

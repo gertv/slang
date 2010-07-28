@@ -20,6 +20,8 @@ import org.junit.{Before, Test}
 import org.junit.Assert.{assertNotNull,assertTrue,assertEquals}
 import java.util.jar.JarInputStream
 import java.io.{ByteArrayInputStream, FileOutputStream, ByteArrayOutputStream, File}
+import tools.nsc.io.AbstractFile
+import org.osgi.framework.BundleContext
 
 /**
  * Test cases for {@link ScalaTransformer}
@@ -27,10 +29,17 @@ import java.io.{ByteArrayInputStream, FileOutputStream, ByteArrayOutputStream, F
 class ScalaTransformerTest {
 
   var transformer : ScalaTransformer = null
+  lazy val repository =
+    if (System.getProperty("maven.local.repo") != null) {
+      new File(System.getProperty("maven.local.repo"))
+    } else {
+      new File(new File(System.getProperty("user.home"), ".m2"), "repository") 
+    }
 
   @Before
   def createTransformer = {
-    transformer = ScalaTransformer.create(null)
+    val library = new File(repository, "org/scala-lang/scala-library/2.8.0/scala-library-2.8.0.jar")
+    transformer = ScalaTransformer.create(List(AbstractFile.getFile(library)))
   }
 
   @Test
@@ -78,7 +87,7 @@ class ScalaTransformerTest {
     var result = List[String]()
     var entry = jar.getNextEntry
     while (entry != null) {
-      result += entry.getName
+      result = entry.getName :: result
       entry = jar.getNextEntry
     }
     result

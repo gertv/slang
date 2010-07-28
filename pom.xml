@@ -29,17 +29,20 @@
   <inceptionYear>2010</inceptionYear>
 
   <properties>
+    <aries.blueprint.version>0.1-r964701</aries.blueprint.version>
     <bnd.version.policy>[$(version;==;$(@)),$(version;+;$(@)))</bnd.version.policy>
-    <felix.fileinstall.version>2.0.4</felix.fileinstall.version>
+    <felix.fileinstall.version>3.0.0</felix.fileinstall.version>
     <felix.osgi.version>1.4.0</felix.osgi.version>
-    <felix.plugin.version>2.0.1</felix.plugin.version>
-    <junit.version>4.7</junit.version>
-    <karaf.version>1.2.0</karaf.version>
+    <felix.plugin.version>2.1.0</felix.plugin.version>     
+    <junit.version>4.8.1</junit.version>
+    <karaf.version>2.0.0</karaf.version>
     <osgi.version>4.2.0</osgi.version>
     <pax.exam.version>1.2.0</pax.exam.version>
-    <pax.logging.version>1.4</pax.logging.version>
+    <pax.logging.version>1.5.2</pax.logging.version>
     <pax.swissbox.version>1.2.0</pax.swissbox.version>
-    <scala.version>2.7.7</scala.version>
+    <scala.version>2.8.0</scala.version>
+
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
   <modules>
@@ -88,6 +91,17 @@
         <groupId>org.osgi</groupId>
         <artifactId>org.osgi.core</artifactId>
         <version>${osgi.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.aries.blueprint</groupId>
+        <artifactId>org.apache.aries.blueprint</artifactId>
+        <version>${aries.blueprint.version}</version>
+        <exclusions>
+          <exclusion>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>javax.servlet</artifactId>
+          </exclusion>
+        </exclusions>
       </dependency>
 
       <!-- test-only dependencies -->

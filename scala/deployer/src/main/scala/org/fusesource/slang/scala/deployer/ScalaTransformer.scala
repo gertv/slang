@@ -27,17 +27,9 @@ import java.io.{InputStream, File, OutputStream}
 /**
  * 
  */
-class ScalaTransformer(val context: BundleContext) {
+class ScalaTransformer(val bundles: List[AbstractFile]) {
 
   final val LOG = LogFactory.getLog(classOf[ScalaTransformer])
-
-  val bundles : List[AbstractFile] = if (context == null) {
-    List()
-  } else {
-    val framework = context.getProperty("karaf.framework")
-    val jar = new File(context.getProperty("karaf.base"), context.getProperty("karaf.framework." + framework))
-    AbstractFile.getDirectory(jar) :: Bundles.create(context.getBundles)
-  }
 
   val compiler = new ScalaCompiler(bundles)
 
@@ -72,6 +64,17 @@ class ScalaTransformer(val context: BundleContext) {
 
 object ScalaTransformer {
 
-  def create(context: BundleContext) = new ScalaTransformer(context)
+  def create(context: BundleContext) = {
+    val bundles : List[AbstractFile] = if (context == null) {
+      List()
+    } else {
+      val framework = context.getProperty("karaf.framework")
+      val jar = new File(context.getProperty("karaf.base"), context.getProperty("karaf.framework." + framework))
+      AbstractFile.getDirectory(jar) :: Bundles.create(context.getBundles)
+    }
+    new ScalaTransformer(bundles)
+  }
+
+  def create(libraries: List[AbstractFile]) = new ScalaTransformer(libraries)
 
 }

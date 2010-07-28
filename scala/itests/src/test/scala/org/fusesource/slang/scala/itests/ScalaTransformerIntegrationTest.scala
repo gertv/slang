@@ -22,9 +22,12 @@ import org.junit.Test
 import org.junit.Assert.{assertNotNull}
 import org.ops4j.pax.exam.Inject
 import org.ops4j.pax.exam.CoreOptions.{options, mavenBundle, systemProperties, systemProperty, bootDelegationPackage, provision}
+import org.ops4j.pax.exam.container.`def`.PaxRunnerOptions.{scanFeatures}
 import org.ops4j.pax.exam.junit.{Configuration, JUnit4TestRunner}
 import java.util.jar.JarInputStream
 import java.io.{FileOutputStream, ByteArrayInputStream, ByteArrayOutputStream}
+import org.ops4j.pax.exam.options.ProvisionOption
+import org.ops4j.pax.exam.container.`def`.options.FeaturesScannerProvisionOption
 
 /**
  * Skeleton class for starting to build more extensive integration tests
@@ -47,10 +50,12 @@ class ScalaTransformerIntegration {
   def configuration: Array[org.ops4j.pax.exam.Option] = {
     println("Configuring")
     options(
-      provision("scan-features:mvn:org.fusesource.slang/features/1.0.0-SNAPSHOT/xml/features"),
+      provision(
+        "mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.scala-library/2.8.0_1-SNAPSHOT"
+      ),
       systemProperties(
         systemProperty("org.ops4j.pax.url.mvn.repositories").value("http://www.scala-tools.com/repo-releases"),
         systemProperty("org.ops4j.pax.url.mvn.defaultRepositories").value("http://www.scala-tools.com/repo-releases")
-      ),
+      )
   )}
 }
