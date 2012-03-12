@@ -4,7 +4,6 @@ webgen.cache
 .sitecopyrc.tmp
 .sitecopy.tmp
 .DS_Store
-*.iml
-*.ipr
-*.iws
+*.i??
+.idea
 
