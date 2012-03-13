@@ -69,6 +69,7 @@
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-eclipse-plugin</artifactId>
+        <version>2.9</version>
         <configuration>
           <downloadSources>true</downloadSources>
           <buildcommands>
@@ -90,10 +91,10 @@
               <instructions>
                   <!-- Set the blueprint graceperiod flag to false to allow the bundle to start.
                        See the blueprint config file for more details. -->
-                  <Bundle-SymbolicName>${pom.artifactId};blueprint.graceperiod:=false</Bundle-SymbolicName>
-                  <Export-Package>${pom.artifactId}*;version=${project.version}</Export-Package>
+                  <Bundle-SymbolicName>${project.artifactId};blueprint.graceperiod:=false</Bundle-SymbolicName>
+                  <Export-Package>${project.artifactId}*;version=${project.version}</Export-Package>
                   <Import-Package>
-                    !${pom.artifactId}*,
+                    !${project.artifactId}*,
                     org.apache.commons.logging;version="[1.1, 1.2)",
                     *
                   </Import-Package>
@@ -111,6 +112,7 @@
       <plugin>
         <groupId>org.scala-tools</groupId>
         <artifactId>maven-scala-plugin</artifactId>
+        <version>2.15.2</version>
       </plugin>
     </plugins>
   </reporting>
