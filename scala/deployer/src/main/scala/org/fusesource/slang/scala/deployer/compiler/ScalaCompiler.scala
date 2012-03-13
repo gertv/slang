@@ -93,8 +93,8 @@ class ScalaCompiler(bundles: List[AbstractFile]) {
        for creating a representation of the classpath internal to the Scala compiler
        and injecting our OSGi bundles into this internal classpath. */
     override def rootLoader = {
-      val cp = classpath.asInstanceOf[ClassPath[AbstractFile]]
-      (new loaders.JavaPacakageLoader (cp)).asInstanceOf[LazyType]
+      val cp = classPath.asInstanceOf[ClassPath[AbstractFile]]
+      (new loaders.JavaPackageLoader (cp)).asInstanceOf[LazyType]
     }
 
     def createClassPath [T] (original: ClassPath[T]) = {
