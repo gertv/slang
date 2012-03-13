@@ -3,6 +3,9 @@
   Copyright (C) FuseSource, Inc.
   http://fusesource.com
 
+  Copyright (C) Crossing-Tech SA, 2012
+  Contact: <guillaume.yziquel@crossing-tech.com>
+
   Licensed under the Apache License, Version 2.0 (the "License");
   you may not use this file except in compliance with the License.
   You may obtain a copy of the License at
@@ -17,10 +20,6 @@
 -->
 <blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
 
-  <service auto-export="interfaces" depends-on="scalaUrlHandler">
-    <bean class="org.fusesource.slang.scala.deployer.ScalaDeploymentListener"/>
-  </service>
-
   <service id="scalaUrlHandler" interface="org.osgi.service.url.URLStreamHandlerService">
     <service-properties>
       <entry key="url.handler.protocol" value="scala"/>
@@ -29,5 +28,14 @@
       <property name="bundleContext" ref="blueprintBundleContext"/>
     </bean>
   </service>
+
+  <bean id="scalaDeploymentListener" class="org.fusesource.slang.scala.deployer.ScalaDeploymentListener" activation="lazy"/>
+
+  <!-- Force a reference to the url handler above from the osgi registry to (try to) make sure
+       the url handler is registered inside the framework. Else we can run into timing issues
+       where fileinstall will use the scalaDeploymentListener before the url can be actually
+       used. In order to not block the bundle, the blueprint.graceperiod=false flag must be set
+       on the SymbolicName osgi header -->
+  <service ref="scalaDeploymentListener" auto-export="interfaces" depends-on="scalaUrlHandlerRef"/>
 
 </blueprint>

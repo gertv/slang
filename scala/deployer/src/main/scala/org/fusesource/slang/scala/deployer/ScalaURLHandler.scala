@@ -2,6 +2,9 @@
  * Copyright (C) FuseSource, Inc.
  * http://fusesource.com
  *
+ * Copyright (C) Crossing-Tech SA, 2012.
+ * Contact: <guillaume.yziquel@crossing-tech.com>
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -56,7 +59,7 @@ class ScalaURLHandler extends AbstractURLStreamHandlerService {
       throw new MalformedURLException("Path can not be null or empty. Syntax: " + SYNTAX)
     }
     LOG.debug("Scala source URL is: [" + url.getPath + "]")
-    return new Connection(url)
+    new Connection(url)
   }
 
   class Connection(val source: URL) extends URLConnection(source) {
@@ -81,7 +84,6 @@ class ScalaURLHandler extends AbstractURLStreamHandlerService {
       }
     }
 
-    def connect: Unit = {
-    }
+    def connect {}
   }
 }

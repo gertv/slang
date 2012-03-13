@@ -5,6 +5,9 @@
     Copyright (C) FuseSource, Inc.
     http://fusesource.com
 
+    Copyright (C) Crossing-Tech SA, 2012.
+    Contact: <guillaume.yziquel@crossing-tech.com>
+
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
     You may obtain a copy of the License at
@@ -34,12 +37,12 @@
     <felix.osgi.version>1.4.0</felix.osgi.version>
     <felix.plugin.version>2.1.0</felix.plugin.version>     
     <junit.version>4.8.1</junit.version>
-    <karaf.version>2.0.0</karaf.version>
+    <karaf.version>2.2.5</karaf.version>
     <osgi.version>4.2.0</osgi.version>
     <pax.exam.version>1.2.0</pax.exam.version>
     <pax.logging.version>1.5.2</pax.logging.version>
     <pax.swissbox.version>1.2.0</pax.swissbox.version>
-    <scala.version>2.8.0</scala.version>
+    <scala.version>2.9.1</scala.version>
 
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
