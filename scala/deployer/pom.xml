@@ -5,6 +5,9 @@
     Copyright (C) FuseSource, Inc.
     http://fusesource.com
 
+    Copyright (C) Crossing-Tech SA, 2012.
+    Contact: <guillaume.yziquel@crossing-tech.com>
+
     Licensed under the Apache License, Version 2.0 (the "License");
     you may not use this file except in compliance with the License.
     You may obtain a copy of the License at
@@ -85,7 +88,9 @@
           <artifactId>maven-bundle-plugin</artifactId>
           <configuration>
               <instructions>
-                  <Bundle-SymbolicName>${pom.artifactId}</Bundle-SymbolicName>
+                  <!-- Set the blueprint graceperiod flag to false to allow the bundle to start.
+                       See the blueprint config file for more details. -->
+                  <Bundle-SymbolicName>${pom.artifactId};blueprint.graceperiod:=false</Bundle-SymbolicName>
                   <Export-Package>${pom.artifactId}*;version=${project.version}</Export-Package>
                   <Import-Package>
                     !${pom.artifactId}*,

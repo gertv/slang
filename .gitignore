@@ -6,4 +6,4 @@ webgen.cache
 .DS_Store
 *.i??
 .idea
-
+*.swp
