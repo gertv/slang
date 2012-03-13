@@ -38,7 +38,7 @@ class ScalaTransformerTest {
 
   @Before
   def createTransformer = {
-    val library = new File(repository, "org/scala-lang/scala-library/2.8.0/scala-library-2.8.0.jar")
+    val library = new File(repository, "org/scala-lang/scala-library/2.9.1/scala-library-2.9.1.jar")
     transformer = ScalaTransformer.create(List(AbstractFile.getFile(library)))
   }
 
