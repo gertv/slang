@@ -18,13 +18,13 @@
   See the License for the specific language governing permissions and
   limitations under the License.
 -->
-<features name="slang-1.0.0-SNAPSHOT">
-    <feature name="slang-scala" version="1.0.0-SNAPSHOT">
+<features name="slang-${project.version}">
+    <feature name="slang-scala" version="${project.version}">
       <!-- everything for the deployer -->
-      <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.scala-library/2.9.1_1</bundle>
-      <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.scala-compiler/2.9.1_1</bundle>
-      <bundle>mvn:org.fusesource.slang.scala/org.fusesource.slang.scala.deployer/1.0.0-SNAPSHOT</bundle>
+      <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.scala-library/${scala.version}_2</bundle>
+      <bundle>mvn:org.apache.servicemix.bundles/org.apache.servicemix.bundles.scala-compiler/${scala.version}_2</bundle>
+      <bundle>mvn:org.fusesource.slang.scala/org.fusesource.slang.scala.deployer/${project.version}</bundle>
       <!-- common -->
-      <bundle>mvn:org.fusesource.slang.scala/org.fusesource.slang.scala.common/1.0.0-SNAPSHOT</bundle>
+      <bundle>mvn:org.fusesource.slang.scala/org.fusesource.slang.scala.common/${project.version}</bundle>
     </feature>
 </features>
