@@ -36,6 +36,8 @@
        where fileinstall will use the scalaDeploymentListener before the url can be actually
        used. In order to not block the bundle, the blueprint.graceperiod=false flag must be set
        on the SymbolicName osgi header -->
+  <reference id="scalaUrlHandlerRef" interface="org.osgi.service.url.URLStreamHandlerService" filter="url.handler.protocol=scala"/>
+
   <service ref="scalaDeploymentListener" auto-export="interfaces" depends-on="scalaUrlHandlerRef"/>
 
 </blueprint>
