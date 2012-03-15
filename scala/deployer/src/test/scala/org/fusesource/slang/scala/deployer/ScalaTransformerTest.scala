@@ -2,6 +2,9 @@
  * Copyright (C) FuseSource, Inc.
  * http://fusesource.com
  *
+ * Copyright (C) Crossing-Tech SA, 2012.
+ * Contact: <guillaume.yziquel@crossing-tech.com>
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -44,7 +47,7 @@ class ScalaTransformerTest {
 
   @Test
   def testCompile = {
-    val source = this.getClass.getClassLoader.getResource("SimpleTest.scala")
+    val source = ScalaSource(this.getClass.getClassLoader.getResource("SimpleTest.scala"))
     val result = transformer.compile(source)
 
     assertNotNull(result.lookupName("SimpleTest.class", false))
@@ -53,7 +56,7 @@ class ScalaTransformerTest {
 
   @Test
   def testTransform = {
-    val source = this.getClass.getClassLoader.getResource("SimpleTest.scala")
+    val source = ScalaSource(this.getClass.getClassLoader.getResource("SimpleTest.scala"))
     val result = new ByteArrayOutputStream
 
     transformer.transform(source, result)
@@ -66,7 +69,7 @@ class ScalaTransformerTest {
 
   @Test
   def testTransformWithActivator = {
-    val source = this.getClass.getClassLoader.getResource("TestWithActivator.scala")
+    val source = ScalaSource(this.getClass.getClassLoader.getResource("TestWithActivator.scala"))
     val result = new ByteArrayOutputStream()
 
     transformer.transform(source, result)

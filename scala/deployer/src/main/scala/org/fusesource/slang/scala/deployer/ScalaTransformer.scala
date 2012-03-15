@@ -2,6 +2,9 @@
  * Copyright (C) FuseSource, Inc.
  * http://fusesource.com
  *
+ * Copyright (C) Crossing-Tech SA, 2012.
+ * Contact: <guillaume.yziquel@crossing-tech.com>
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -19,24 +22,21 @@ package org.fusesource.slang.scala.deployer
 import archiver.ScalaArchiver
 import compiler.{Bundles, ScalaCompiler}
 import org.apache.commons.logging.LogFactory
-import tools.nsc.io.{PlainFile, AbstractFile}
+import tools.nsc.io.AbstractFile
 import java.net.URL
 import org.osgi.framework.{BundleContext, Bundle}
-import java.io.{InputStream, File, OutputStream}
+import java.io.{File, InputStream, OutputStream}
 
-/**
- * 
- */
 class ScalaTransformer(val bundles: List[AbstractFile]) {
 
   final val LOG = LogFactory.getLog(classOf[ScalaTransformer])
 
-  val compiler = new ScalaCompiler(bundles)
+  val compiler = new ScalaCompiler (bundles)
 
-  val archiver = new ScalaArchiver(bundles) 
+  val archiver = new ScalaArchiver (bundles) 
 
-  def transform(url: URL, stream: OutputStream) : Unit = {
-    val result = transform(url)
+  def transform(source: ScalaSource, stream: OutputStream) {
+    val result = transform(source)
     val bytes = new Array[Byte](1024)
     var read = result.read(bytes)
     while (read > 0) {
@@ -46,25 +46,25 @@ class ScalaTransformer(val bundles: List[AbstractFile]) {
     result.close
   }
 
-  def transform(url: URL) : InputStream = {
-    LOG.info("Transforming " + url + " into an OSGi bundle")
-    archiver.archive(compile(url), url)
+  def transform (source: ScalaSource) : InputStream = {
+    LOG.info("Transforming " + source + " into an OSGi bundle")
+    archiver.archive(compile(source), source)
   }
 
-  def compile(url: URL) = compiler.compile(files(url))
-
-  def files(url: URL) : List[AbstractFile] = {
-    if ("file" == url.getProtocol) {
-      List(new PlainFile(new File(url.toURI)))
-    } else {
-      List(AbstractFile.getURL(url))
-    }
-  }
+  def compile (source: AbstractFile) = compiler.compile (source)
 }
 
 object ScalaTransformer {
 
-  def create(context: BundleContext) = {
+//  def file (url: URL) : AbstractFile = {
+//    if ("file" == url.getProtocol) {
+//      new PlainFile (new File (url.toURI))
+//    } else {
+//      AbstractFile.getURL(url)
+//    }
+//  }
+
+  def create (context: BundleContext) : ScalaTransformer = {
     val bundles : List[AbstractFile] = if (context == null) {
       List()
     } else {
@@ -72,9 +72,16 @@ object ScalaTransformer {
       val jar = new File(context.getProperty("karaf.base"), context.getProperty("karaf.framework." + framework))
       AbstractFile.getDirectory(jar) :: Bundles.create(context.getBundles)
     }
-    new ScalaTransformer(bundles)
+    create (bundles)
   }
 
-  def create(libraries: List[AbstractFile]) = new ScalaTransformer(libraries)
+  def create (libraries: List[AbstractFile]) : ScalaTransformer =
+    new ScalaTransformer(libraries)
+
+  def transform (context: BundleContext, url: URL) = {
+    val source = ScalaSource (url)
+    //val manifest = manifest(sourceFile)
+    create(context).transform(source)
+  }
 
 }

@@ -2,6 +2,9 @@
  * Copyright (C) FuseSource, Inc.
  * http://fusesource.com
  *
+ * Copyright (C) Crossing-Tech SA, 2012.
+ * Contact: <guillaume.yziquel@crossing-tech.com>
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -16,17 +19,16 @@
  */
 package org.fusesource.slang.scala.deployer.archiver
 
+import java.io._
+import java.net.URL
+import java.util.Properties
+import java.util.jar._
+import org.apache.commons.logging.LogFactory
 import tools.nsc.io.AbstractFile
 import tools.nsc.interpreter.AbstractFileClassLoader
 import org.osgi.framework.BundleActivator
-import java.util.jar.JarFile.MANIFEST_NAME
-import java.util.jar.{Attributes, Manifest, JarEntry, JarOutputStream}
-import java.io.{ByteArrayOutputStream, ByteArrayInputStream, InputStream, OutputStream}
 import org.ops4j.pax.swissbox.bnd.BndUtils.createBundle
-
-import java.util.Properties
-import org.apache.commons.logging.LogFactory
-import java.net.URL
+import org.fusesource.slang.scala.deployer.ScalaSource
 
 /**
  * Helper class that stores the contents of a Scala compile {@link AbstractFile}
@@ -38,7 +40,7 @@ class ScalaArchiver(bundles: List[AbstractFile]) {
 
   val classloaders = bundles.map(new AbstractFileClassLoader(_, getClass.getClassLoader))
 
-  def archive(dir: AbstractFile, url: URL) : InputStream = {
+  def archive(dir: AbstractFile, source: ScalaSource) : InputStream = {
     val classloader = createClassLoader(dir)
 
     val props = new Properties
@@ -63,7 +65,7 @@ class ScalaArchiver(bundles: List[AbstractFile]) {
     bytes.close
 
     createBundle(new ByteArrayInputStream(bytes.toByteArray),
-                 props, bsn(url))
+                 props, bsn(source.url))
   }
     
   def entries(dir: AbstractFile)(action: (String, AbstractFile) => Unit) : Unit = 

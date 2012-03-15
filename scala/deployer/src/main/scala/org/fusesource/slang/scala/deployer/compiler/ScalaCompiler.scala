@@ -19,10 +19,10 @@
  */
 package org.fusesource.slang.scala.deployer.compiler
 
-import tools.nsc.reporters.{AbstractReporter, Reporter}
+import tools.nsc.reporters.AbstractReporter
 import org.apache.commons.logging.LogFactory
-import tools.nsc.io.{VirtualDirectory, PlainFile, AbstractFile}
-import tools.nsc.{Interpreter, Global, Settings}
+import tools.nsc.io.{VirtualDirectory, AbstractFile}
+import tools.nsc.{Global, Settings}
 import tools.nsc.util._
 
 /**
@@ -33,8 +33,8 @@ class ScalaCompiler(bundles: List[AbstractFile]) {
 
   final val LOG = LogFactory.getLog(classOf[ScalaCompiler])
 
-  def compile(sources: List[AbstractFile]) : AbstractFile = {
-    LOG.info("Compiling " + sources)
+  def compile(source: AbstractFile) : AbstractFile = {
+    LOG.info("Compiling " + source)
     val dir = new VirtualDirectory("memory", None)
 
     settings.outputDirs.setSingleOutput(dir)
@@ -62,7 +62,7 @@ class ScalaCompiler(bundles: List[AbstractFile]) {
       e.printStackTrace()
       throw e
     }
-    run.compileFiles(sources)
+    run.compileFiles (List(source))
 
     dir
 
@@ -71,6 +71,7 @@ class ScalaCompiler(bundles: List[AbstractFile]) {
   lazy val settings = new Settings
 
   lazy val reporter = new AbstractReporter {
+
     def displayPrompt = println("compiler:")
 
     def display(position: Position, msg: String, severity: Severity): Unit = {
@@ -80,7 +81,7 @@ class ScalaCompiler(bundles: List[AbstractFile]) {
     val settings = ScalaCompiler.this.settings
   }
 
-    lazy val compiler = new Global(settings, reporter) {
+  lazy val compiler = new Global(settings, reporter) {
 
     override def classPath = {
       require(!forMSIL, "MSIL not supported")
@@ -94,7 +95,10 @@ class ScalaCompiler(bundles: List[AbstractFile]) {
        and injecting our OSGi bundles into this internal classpath. */
     override def rootLoader = {
       val cp = classPath.asInstanceOf[ClassPath[AbstractFile]]
-      (new loaders.JavaPackageLoader (cp)).asInstanceOf[LazyType]
+      new loaders.JavaPackageLoader (cp) match {
+        case loader : LazyType => loader
+        case _ => throw new Exception ("Failed to create rootLoader of embedded Scala compiler.")
+      }
     }
 
     def createClassPath [T] (original: ClassPath[T]) = {
