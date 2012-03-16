@@ -18,12 +18,17 @@ package org.fusesource.slang.scala.deployer
 
 import java.io.File
 import java.net.URL
+import org.apache.commons.logging.LogFactory
+import org.osgi.framework.BundleContext
 import tools.nsc.io.AbstractFile
 import tools.nsc.io.PlainFile
+import compiler.Bundles
 import compiler.ScalaCompiler
 import archiver.ScalaArchiver
 
 trait ScalaSource extends AbstractFile {
+
+	final val LOG = LogFactory.getLog(classOf[ScalaSource])
 
 	val url : URL
 
@@ -31,13 +36,20 @@ trait ScalaSource extends AbstractFile {
 
 	override def toString = url.toString
 
-	def compile () : AbstractFile =
+	def compile () : AbstractFile = {
+		LOG.debug ("Compiling " + this + " using embedded Scala compiler.")
 		(new ScalaCompiler (libs)).compile (this)
+	}
 
-	def archive (dir : AbstractFile) =
+	def archive (dir : AbstractFile) = {
+		LOG.debug ("Archiving compiled " + this + " into an OSGi bundle.")
 		(new ScalaArchiver (libs)).archive (dir, this)
+	}
 
-	def transform () = archive(compile())
+	def transform () = {
+		LOG.info ("Transforming " + this + " into an OSGi bundle.")
+		archive (compile ())
+	}
 
 }
 
@@ -52,6 +64,21 @@ object ScalaSource {
 	case _ =>
 		throw new Exception ("Invalid URL or BundleContext for ScalaSource construction.")
 		// TODO: We should perhaps use AbstractFile.getURL(u) here.
+	}
+
+	def apply (url : URL, context : BundleContext) : ScalaSource = {
+		val bundles = Option(context) match {
+		case None =>
+			throw new Exception ("No BundleContext available to search for OSGi bundles.")
+			// TODO: Why not List()?
+		case Some (ctxt) =>
+			val framework = ctxt.getProperty ("karaf.framework")
+			val jar = new File (
+				ctxt.getProperty ("karaf.base"),
+				ctxt.getProperty ("karaf.framework." + framework))
+			AbstractFile.getDirectory(jar) :: Bundles.create (ctxt.getBundles)
+		}
+		ScalaSource (url, bundles)
 	}
 
 }
