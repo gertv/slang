@@ -35,16 +35,16 @@ class ScalaTransformer(val bundles: List[AbstractFile]) {
 
   val archiver = new ScalaArchiver (bundles) 
 
-  def transform(source: ScalaSource, stream: OutputStream) {
-    val result = transform(source)
-    val bytes = new Array[Byte](1024)
-    var read = result.read(bytes)
-    while (read > 0) {
-      stream.write(bytes, 0, read)
-      read = result.read(bytes)
-    }
-    result.close
-  }
+//  def transform(source: ScalaSource, stream: OutputStream) {
+//    val result = transform(source)
+//    val bytes = new Array[Byte](1024)
+//    var read = result.read(bytes)
+//    while (read > 0) {
+//      stream.write(bytes, 0, read)
+//      read = result.read(bytes)
+//    }
+//    result.close
+//  }
 
   def transform (source: ScalaSource) : InputStream = {
     LOG.info("Transforming " + source + " into an OSGi bundle")
@@ -70,10 +70,35 @@ object ScalaTransformer {
   def create (libraries: List[AbstractFile]) : ScalaTransformer =
     new ScalaTransformer(libraries)
 
-  def transform (context: BundleContext, url: URL) = {
-    val source = ScalaSource (url, context)
-    //val manifest = manifest(sourceFile)
-    create(source.bundles).transform(source)
+  def transform (context: BundleContext, url: URL) : InputStream = {
+	val bundles = Option(context) match {
+	case None =>
+		throw new Exception ("No BundleContext available to search for OSGi bundles.")
+		// TODO: Why not List()?
+	case Some (ctxt) =>
+		val framework = ctxt.getProperty ("karaf.framework")
+		val jar = new File (
+			ctxt.getProperty ("karaf.base"),
+			ctxt.getProperty ("karaf.framework." + framework))
+		AbstractFile.getDirectory(jar) :: Bundles.create (ctxt.getBundles)
+	}
+	transform (bundles, url)
   }
 
+  def transform (libraries: List[AbstractFile], url: URL) = {
+	val source = ScalaSource (url, libraries)
+	// val manifest = manifest (source)
+	create(source.libs).transform(source)
+  }
+
+  def transform (libraries: List[AbstractFile], url: URL, stream: OutputStream) {
+	val result = transform (libraries, url)
+	val bytes = new Array[Byte] (1024)
+	var read = result.read(bytes)
+	while (read > 0) {
+		stream.write(bytes, 0, read)
+		read = result.read (bytes)
+	}
+	result.close
+  }
 }

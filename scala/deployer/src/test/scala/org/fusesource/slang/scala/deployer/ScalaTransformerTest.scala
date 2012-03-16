@@ -31,7 +31,8 @@ import org.osgi.framework.BundleContext
  */
 class ScalaTransformerTest {
 
-  var transformer : ScalaTransformer = null
+  //var transformer : ScalaTransformer = null
+  var libraries : List[AbstractFile] = Nil
   lazy val repository =
     if (System.getProperty("maven.local.repo") != null) {
       new File(System.getProperty("maven.local.repo"))
@@ -41,14 +42,14 @@ class ScalaTransformerTest {
 
   @Before
   def createTransformer = {
-    val library = new File(repository, "org/scala-lang/scala-library/2.9.1/scala-library-2.9.1.jar")
-    transformer = ScalaTransformer.create(List(AbstractFile.getFile(library)))
+    val scalaLib = new File(repository, "org/scala-lang/scala-library/2.9.1/scala-library-2.9.1.jar")
+    libraries = List(AbstractFile.getFile(scalaLib))
   }
 
   @Test
   def testCompile = {
-    val source = ScalaSource(this.getClass.getClassLoader.getResource("SimpleTest.scala"))
-    val result = transformer.compile(source)
+    val source = ScalaSource(this.getClass.getClassLoader.getResource("SimpleTest.scala"), libraries)
+    val result = source.compile()
 
     assertNotNull(result.lookupName("SimpleTest.class", false))
     assertNotNull(result.lookupPath("org/test/AnotherSimpleTest.class", false))
@@ -56,12 +57,14 @@ class ScalaTransformerTest {
 
   @Test
   def testTransform = {
-    val source = ScalaSource(this.getClass.getClassLoader.getResource("SimpleTest.scala"))
-    val result = new ByteArrayOutputStream
-
-    transformer.transform(source, result)
-
-    var jar = new JarInputStream(new ByteArrayInputStream(result.toByteArray))
+    val source = ScalaSource(this.getClass.getClassLoader.getResource("SimpleTest.scala"), libraries)
+    val result = source.transform ()
+    //val result = new ByteArrayOutputStream
+    //
+    //ScalaTransformer.transform (libraries, source, result)
+    //
+    //var jar = new JarInputStream(new ByteArrayInputStream(result.toByteArray))
+    var jar = new JarInputStream(result)
     var entries = getEntries(jar)
     assertTrue(entries.contains("SimpleTest.class"))
     assertTrue(entries.contains("org/test/AnotherSimpleTest.class"))
@@ -69,12 +72,14 @@ class ScalaTransformerTest {
 
   @Test
   def testTransformWithActivator = {
-    val source = ScalaSource(this.getClass.getClassLoader.getResource("TestWithActivator.scala"))
-    val result = new ByteArrayOutputStream()
-
-    transformer.transform(source, result)
-
-    var jar = new JarInputStream(new ByteArrayInputStream(result.toByteArray))
+    val source = ScalaSource(this.getClass.getClassLoader.getResource("TestWithActivator.scala"), libraries)
+    val result = source.transform ()
+    //val result = new ByteArrayOutputStream()
+    //
+    //transformer.transform(source, result)
+    //
+    //var jar = new JarInputStream(new ByteArrayInputStream(result.toByteArray))
+    var jar = new JarInputStream(result)
     var entries = getEntries(jar)
     assertTrue(entries.contains("org/test/TestWithActivator.class"))
 
