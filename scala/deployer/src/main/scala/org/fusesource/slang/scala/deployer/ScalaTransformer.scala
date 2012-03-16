@@ -24,7 +24,7 @@ import compiler.{Bundles, ScalaCompiler}
 import org.apache.commons.logging.LogFactory
 import tools.nsc.io.AbstractFile
 import java.net.URL
-import org.osgi.framework.{BundleContext, Bundle}
+import org.osgi.framework.BundleContext
 import java.io.{File, InputStream, OutputStream}
 
 class ScalaTransformer(val bundles: List[AbstractFile]) {
@@ -56,32 +56,24 @@ class ScalaTransformer(val bundles: List[AbstractFile]) {
 
 object ScalaTransformer {
 
-//  def file (url: URL) : AbstractFile = {
-//    if ("file" == url.getProtocol) {
-//      new PlainFile (new File (url.toURI))
+//  def create (context: BundleContext) : ScalaTransformer = {
+//    val bundles : List[AbstractFile] = if (context == null) {
+//      List()
 //    } else {
-//      AbstractFile.getURL(url)
+//      val framework = context.getProperty("karaf.framework")
+//      val jar = new File(context.getProperty("karaf.base"), context.getProperty("karaf.framework." + framework))
+//      AbstractFile.getDirectory(jar) :: Bundles.create(context.getBundles)
 //    }
+//    create (bundles)
 //  }
-
-  def create (context: BundleContext) : ScalaTransformer = {
-    val bundles : List[AbstractFile] = if (context == null) {
-      List()
-    } else {
-      val framework = context.getProperty("karaf.framework")
-      val jar = new File(context.getProperty("karaf.base"), context.getProperty("karaf.framework." + framework))
-      AbstractFile.getDirectory(jar) :: Bundles.create(context.getBundles)
-    }
-    create (bundles)
-  }
 
   def create (libraries: List[AbstractFile]) : ScalaTransformer =
     new ScalaTransformer(libraries)
 
   def transform (context: BundleContext, url: URL) = {
-    val source = ScalaSource (url)
+    val source = ScalaSource (url, context)
     //val manifest = manifest(sourceFile)
-    create(context).transform(source)
+    create(source.bundles).transform(source)
   }
 
 }

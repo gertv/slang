@@ -18,25 +18,44 @@ package org.fusesource.slang.scala.deployer
 
 import java.io.File
 import java.net.URL
+import org.osgi.framework.BundleContext
 import tools.nsc.io.AbstractFile
 import tools.nsc.io.PlainFile
+import compiler.Bundles
 
 trait ScalaSource extends AbstractFile {
 
 	val url : URL
 
+	val context : BundleContext
+
 	override def toString = url.toString
+
+	val bundles = Option (context) match {
+	case None =>
+		throw new Exception ("No BundleContext available to search for OSGi bundles.")
+		//List()
+	case Some (ctxt) =>
+		val framework = ctxt.getProperty("karaf.framework")
+		val jar = new File(
+			ctxt.getProperty("karaf.base"),
+			ctxt.getProperty("karaf.framework." + framework))
+		AbstractFile.getDirectory(jar) :: Bundles.create(ctxt.getBundles)
+	}
 
 }
 
 object ScalaSource {
 
-	def apply (u : URL) = u.getProtocol match {
-	case "file" =>
-		new PlainFile (new File (u.toURI)) with ScalaSource { val url = u }
+	def apply (url : URL, ctxt : BundleContext) = (Option(url), Option(ctxt)) match {
+	case (Some(u), Some(c)) if u.getProtocol == "file" =>
+		new PlainFile (new File (url.toURI)) with ScalaSource {
+			val url = u
+			val context = c
+		}
 	case _ =>
-		throw new Exception ("Protocol of a ScalaSource must be a file.")
-		//AbstractFile.getURL (url) with ScalaSource
+		throw new Exception ("Invalid URL or BundleContext for ScalaSource construction.")
+		// TODO: We should perhaps use AbstractFile.getURL(u) here.
 	}
 
 }
