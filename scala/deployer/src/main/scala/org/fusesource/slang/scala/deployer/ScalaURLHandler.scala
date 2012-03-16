@@ -19,21 +19,12 @@
  */
 package org.fusesource.slang.scala.deployer
 
-import java.io.ByteArrayInputStream
-import java.io.ByteArrayOutputStream
-import java.io.IOException
-import java.io.InputStream
-import java.net.MalformedURLException
-import java.net.URL
-import java.net.URLConnection
-import org.apache.commons.logging.Log
-import org.apache.commons.logging.LogFactory
-import org.osgi.service.url.AbstractURLStreamHandlerService
 import reflect.BeanProperty
+import java.io._
+import java.net._
+import org.apache.commons.logging._
+import org.osgi.service.url.AbstractURLStreamHandlerService
 import org.osgi.framework.BundleContext
-import org.ops4j.pax.swissbox.bnd.BndUtils.createBundle
-import java.util.Properties
-import org.ops4j.pax.swissbox.bnd.OverwriteMode.MERGE
 
 /**
  * A URL handler that will transform a Scala source file into an OSGi bundle
@@ -72,10 +63,7 @@ class ScalaURLHandler extends AbstractURLStreamHandlerService {
           source
         }
 
-        val script = ScalaSource (url, bundleContext)
-	script.transform()
-
-        //ScalaTransformer.transform (bundleContext, url)
+        ScalaSource(url, bundleContext).transform()
 
       }
       catch {

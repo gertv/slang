@@ -19,12 +19,12 @@
  */
 package org.fusesource.slang.scala.deployer.compiler
 
-import org.osgi.framework.Bundle
-import java.io.{InputStream, IOException, File}
-import scala.tools.nsc.io.{PlainFile, AbstractFile}
-import java.net.{URISyntaxException, URL}
+import annotation.tailrec
+import java.io._
+import java.net._
 import org.apache.commons.logging.LogFactory
-import java.lang.String
+import org.osgi.framework.Bundle
+import tools.nsc.io.{AbstractFile, PlainFile}
 
 /**
  * Helper methods to transform OSGi bundles into {@link AbstractFile} implementations
@@ -93,62 +93,36 @@ object Bundles {
      */
     def isDirectory: Boolean = true
 
-    override def elements: Iterator[AbstractFile] = {
-      new Iterator[AbstractFile]() {
-        val dirs = bundle.getEntryPaths(fullName)
-        var nextEntry = prefetch()
+    override def elements : Iterator[AbstractFile] = {
 
-        def hasNext() = {
-          if (nextEntry == null)
-            nextEntry = prefetch()
-
-          nextEntry != null
-        }
-
-        def next() = {
-          if (hasNext()) {
-              val entry = nextEntry
-              nextEntry = null
-              entry
-          }
-          else {
-            throw new NoSuchElementException()
-          }
-        }
-
-        private def prefetch() = {
-          if (dirs.hasMoreElements) {
-            val entry = dirs.nextElement.asInstanceOf[String]
-            var entryUrl = bundle.getResource("/" + entry)
-
-            // Bundle.getResource seems to be inconsistent with respect to requiring
-            // a trailing slash
-            if (entryUrl == null)
-              entryUrl = bundle.getResource("/" + removeTralingSlash(entry))
-
-            // If still null OSGi wont let use load that resource for some reason
-            if (entryUrl == null) {
-              null
-            }
-            else {
-              if (entry.endsWith(".class"))
-                new FileEntry(bundle, entryUrl, DirEntry.this)
-              else
-                new DirEntry(bundle, entryUrl, DirEntry.this)
-            }
-          }
-          else
-            null
-        }
-
-        private def removeTralingSlash(s: String): String =
+        @tailrec
+        def removeTrailingSlash(s: String): String =
           if (s == null || s.length == 0)
             s
           else if (s.last == '/')
-            removeTralingSlash(s.substring(0, s.length - 1))
+            removeTrailingSlash(s.substring(0, s.length - 1))
           else
             s
-      }
+
+	import scala.collection.JavaConverters._
+	bundle.getEntryPaths(fullName).asScala.map {
+	case entry : String => {
+		val entryUrl = Option(Option(bundle.getResource("/" + entry)).
+			// Bundle.getReource seems to be inconsistent with respect to requiring
+			// a trailing slash.
+			getOrElse(bundle.getResource("/" + removeTrailingSlash(entry))))
+		entryUrl match {
+		case None =>
+			throw new IllegalStateException ("For some reason, OSGi will not let use the entry " + entry)
+		case Some(url) =>
+			if (entry.endsWith(".class"))
+				new FileEntry(bundle, url, DirEntry.this)
+			else	new DirEntry(bundle, url, DirEntry.this)
+		}
+	}
+	case _ =>
+		throw new ClassCastException("Items other than Strings found in an OSGi bundle's entry paths.")
+	}
     }
 
     def lookupName(name: String, directory: Boolean): AbstractFile = {
