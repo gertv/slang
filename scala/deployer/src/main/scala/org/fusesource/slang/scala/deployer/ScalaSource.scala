@@ -97,7 +97,19 @@ class ScalaSource (val url : URL, val libraries : List[AbstractFile]) extends Ab
 
 	override def input : InputStream = plainFile.input
 
+	override def toByteArray : Array[Byte] =
+
+		/* NOTE: If the sizeOption is not properly overriden, the AbstractFile
+		   default implementation of sizeOption will blow up. Hence the 'catch'.
+
+		   These composition vs. inheritance bugs are hard to find. In case this
+		   happens, continue delegating calls to plainFile. */
+
+		try {super.toByteArray} catch {case e => e.printStackTrace(); throw e}
+	
 	override def output : OutputStream = plainFile.output
+
+	override def sizeOption = plainFile.sizeOption
 
 	override def iterator : Iterator[AbstractFile] = plainFile.iterator
 
@@ -107,7 +119,11 @@ class ScalaSource (val url : URL, val libraries : List[AbstractFile]) extends Ab
 	override def lookupNameUnchecked (name : String, directory : Boolean) : AbstractFile =
 		plainFile.lookupNameUnchecked (name, directory)
 
-	override def toString () = url.toString
+	override def toString () =
+		/* This call needs to be delegated to ensure that the referenced file is
+		   named properly. The implementation in PlainFile removes the file: URI
+		   prefix that is fed to a ScalaSource instance at construct-time. */
+		plainFile.toString
 
 	def compile () : AbstractFile = {
 		LOG.debug ("Compiling " + this + " using embedded Scala compiler.")
