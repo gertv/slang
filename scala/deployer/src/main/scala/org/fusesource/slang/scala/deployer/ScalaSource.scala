@@ -16,7 +16,7 @@
  */
 package org.fusesource.slang.scala.deployer
 
-import java.io.File
+import java.io._
 import java.net.URL
 import org.apache.commons.logging.LogFactory
 import org.osgi.framework.BundleContext
@@ -30,11 +30,11 @@ trait ScalaSource extends AbstractFile {
 
 	final val LOG = LogFactory.getLog(classOf[ScalaSource])
 
-	val url : URL
+	def url : URL
 
-	val libs : List[AbstractFile]
+	def libs : List[AbstractFile]
 
-	override def toString = url.toString
+	override def toString () = url.toString
 
 	def compile () : AbstractFile = {
 		LOG.debug ("Compiling " + this + " using embedded Scala compiler.")
@@ -51,6 +51,30 @@ trait ScalaSource extends AbstractFile {
 		archive (compile ())
 	}
 
+	/* It should be noted that the Scala compiler has the following piece of
+	   code to read so-called AbstractFiles. See SourceReader.scala, lines
+	   48 to 59 in the compiler source code.
+
+	   def read(file: AbstractFile): Array[Char] = {
+	     try file match {
+	       case p: PlainFile        => read(p.file)
+	       case z: ZipArchive#Entry => read(Channels.newChannel(z.input))
+	       case _                   => read(ByteBuffer.wrap(file.toByteArray))
+	     }
+	     catch {
+	       case e: Exception => reportEncodingError("" + file) ; Array()
+	     }
+	   }
+
+	   The big problem about this pattern-matching is that the principle of
+	   a common interface using the "toByteArray" method is invalidated. In
+	   our specific case, this means that it useless to override the input(),
+	   toCharArray() or toByteArray() methods to intercept and rewrite on the
+	   fly what is read from the file. */
+
+	def manifest () {
+		/* TODO: Extract manifest from this abstract file. */
+	}
 }
 
 object ScalaSource {
