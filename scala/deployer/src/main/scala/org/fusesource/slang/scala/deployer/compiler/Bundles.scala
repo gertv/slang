@@ -55,10 +55,8 @@ object Bundles {
       catch { case _ => 0 }
 
     @throws(classOf[IOException])
-    def container: AbstractFile =
-      valueOrElse(parent) {
-        throw new IOException("No container")
-      }
+    def container: AbstractFile = Option(parent).getOrElse(
+      throw new IOException ("No container"))
 
     @throws(classOf[IOException])
     def input: InputStream = url.openStream()
@@ -127,11 +125,12 @@ object Bundles {
 
     def lookupName(name: String, directory: Boolean): AbstractFile = {
       val entry = bundle.getEntry(fullName + "/" + name)
-      nullOrElse(entry) { entry =>
-        if (directory)
-          new DirEntry(bundle, entry, DirEntry.this)
-        else
-          new FileEntry(bundle, entry, DirEntry.this)
+      Option(entry) match {
+        case None => null
+        case Some (_) if directory =>
+          new DirEntry (bundle, entry, DirEntry.this)
+        case Some (_) =>
+          new FileEntry (bundle, entry, DirEntry.this)
       }
     }
 
@@ -206,27 +205,7 @@ object Bundles {
    */
   def create(bundle: Bundle): AbstractFile = {
     require(bundle != null, "bundle must not be null")
-
     new DirEntry(bundle, bundle.getResource("/"), null)
   }
-
-  /**
-   * Evaluate <code>f</code> on <code>s</code> if <code>s</code> is not null.
-   * @param s
-   * @param f
-   * @return <code>f(s)</code> if s is not <code>null</code>, <code>null</code> otherwise.
-   */
-  def nullOrElse[S, T](s: S)(f: S => T): T =
-    if (s == null) null.asInstanceOf[T]
-    else f(s)
-
-  /**
-   * @param t
-   * @param default
-   * @return <code>t</code> or <code>default</code> if <code>null</code>.
-   */
-  def valueOrElse[T](t: T)(default: => T) =
-    if (t == null) default
-    else t  
 }
 
