@@ -63,7 +63,7 @@ class ScalaURLHandler extends AbstractURLStreamHandlerService {
           source
         }
 
-        ScalaSource(url, bundleContext).transform()
+        new ScalaSource (url, bundleContext).transform()
 
       }
       catch {

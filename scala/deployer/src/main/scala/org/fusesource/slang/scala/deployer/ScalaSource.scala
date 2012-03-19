@@ -26,30 +26,29 @@ import compiler.Bundles
 import compiler.ScalaCompiler
 import archiver.ScalaArchiver
 
-trait ScalaSource extends AbstractFile {
+class ScalaSource (val url : URL, val libraries : List[AbstractFile]) extends AbstractFile {
 
 	final val LOG = LogFactory.getLog(classOf[ScalaSource])
 
-	def url : URL
+	if ((libraries == null) || libraries.exists(_ == null))
+		throw new Exception ("Invalid libraries for ScalaSource constructor.")
 
-	def libs : List[AbstractFile]
+	if (url == null)
+		throw new Exception ("Invalid URL for ScalaSource constructor.")
 
-	override def toString () = url.toString
-
-	def compile () : AbstractFile = {
-		LOG.debug ("Compiling " + this + " using embedded Scala compiler.")
-		(new ScalaCompiler (libs)).compile (this)
-	}
-
-	def archive (dir : AbstractFile) = {
-		LOG.debug ("Archiving compiled " + this + " into an OSGi bundle.")
-		(new ScalaArchiver (libs)).archive (dir, this)
-	}
-
-	def transform () = {
-		LOG.info ("Transforming " + this + " into an OSGi bundle.")
-		archive (compile ())
-	}
+	def this (url : URL, context : BundleContext) = this (url,
+		Option(context) match {
+		case None =>
+			throw new Exception ("No BundleContext available to search for OSGi bundles.")
+			// TODO: Why not List()?
+		case Some (ctxt) =>
+			val framework = ctxt.getProperty ("karaf.framework")
+			val jar = new File (
+				ctxt.getProperty ("karaf.base"),
+				ctxt.getProperty ("karaf.framework." + framework))
+			AbstractFile.getDirectory(jar) :: Bundles.create (ctxt.getBundles)
+		}
+	)
 
 	/* It should be noted that the Scala compiler has the following piece of
 	   code to read so-called AbstractFiles. See SourceReader.scala, lines
@@ -70,39 +69,62 @@ trait ScalaSource extends AbstractFile {
 	   a common interface using the "toByteArray" method is invalidated. In
 	   our specific case, this means that it useless to override the input(),
 	   toCharArray() or toByteArray() methods to intercept and rewrite on the
-	   fly what is read from the file. */
+	   fly what is read from the file.
+
+	   We therefore chose not to inherit from the PlainFile, but to prefer
+	   composition over inheritance. Which the reason why we have a plainFile
+	   field: fooling this pattern-matching. */
+
+	val plainFile : PlainFile = new PlainFile (new File (url.toURI))
+
+	override def name : String = plainFile.name
+
+	override def path : String = plainFile.path
+
+	override def absolute : AbstractFile = plainFile.absolute
+
+	override def container : AbstractFile = plainFile.container
+
+	override def file : File = plainFile.file
+
+	override def create () : Unit = plainFile.create ()
+
+	override def delete () : Unit = plainFile.delete ()
+
+	override def isDirectory : Boolean = plainFile.isDirectory
+
+	override def lastModified : Long = plainFile.lastModified
+
+	override def input : InputStream = plainFile.input
+
+	override def output : OutputStream = plainFile.output
+
+	override def iterator : Iterator[AbstractFile] = plainFile.iterator
+
+	override def lookupName (name : String, directory : Boolean) : AbstractFile =
+		plainFile.lookupName (name, directory)
+
+	override def lookupNameUnchecked (name : String, directory : Boolean) : AbstractFile =
+		plainFile.lookupNameUnchecked (name, directory)
+
+	override def toString () = url.toString
+
+	def compile () : AbstractFile = {
+		LOG.debug ("Compiling " + this + " using embedded Scala compiler.")
+		(new ScalaCompiler (libraries)).compile (this)
+	}
+
+	def archive (dir : AbstractFile) = {
+		LOG.debug ("Archiving compiled " + this + " into an OSGi bundle.")
+		(new ScalaArchiver (libraries)).archive (dir, this)
+	}
+
+	def transform () = {
+		LOG.info ("Transforming " + this + " into an OSGi bundle.")
+		archive (compile ())
+	}
 
 	def manifest () {
 		/* TODO: Extract manifest from this abstract file. */
 	}
-}
-
-object ScalaSource {
-
-	def apply (url : URL, libs : List[AbstractFile]) = (Option(url), Option(libs)) match {
-	case (Some(u), Some(l)) if u.getProtocol == "file" =>
-		new PlainFile (new File (url.toURI)) with ScalaSource {
-			val url = u
-			val libs = l
-		}
-	case _ =>
-		throw new Exception ("Invalid URL or BundleContext for ScalaSource construction.")
-		// TODO: We should perhaps use AbstractFile.getURL(u) here.
-	}
-
-	def apply (url : URL, context : BundleContext) : ScalaSource = {
-		val bundles = Option(context) match {
-		case None =>
-			throw new Exception ("No BundleContext available to search for OSGi bundles.")
-			// TODO: Why not List()?
-		case Some (ctxt) =>
-			val framework = ctxt.getProperty ("karaf.framework")
-			val jar = new File (
-				ctxt.getProperty ("karaf.base"),
-				ctxt.getProperty ("karaf.framework." + framework))
-			AbstractFile.getDirectory(jar) :: Bundles.create (ctxt.getBundles)
-		}
-		ScalaSource (url, bundles)
-	}
-
 }

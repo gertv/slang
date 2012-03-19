@@ -34,60 +34,50 @@ class ScalaTransformerTest {
   //var transformer : ScalaTransformer = null
   var libraries : List[AbstractFile] = Nil
   lazy val repository =
-    if (System.getProperty("maven.local.repo") != null) {
-      new File(System.getProperty("maven.local.repo"))
+    if (System.getProperty ("maven.local.repo") != null) {
+      new File (System.getProperty ("maven.local.repo"))
     } else {
-      new File(new File(System.getProperty("user.home"), ".m2"), "repository") 
+      new File (new File (System.getProperty ("user.home"), ".m2"), "repository") 
     }
 
   @Before
   def createTransformer = {
-    val scalaLib = new File(repository, "org/scala-lang/scala-library/2.9.1/scala-library-2.9.1.jar")
-    libraries = List(AbstractFile.getFile(scalaLib))
+    val scalaLib = new File (repository, "org/scala-lang/scala-library/2.9.1/scala-library-2.9.1.jar")
+    libraries = List (AbstractFile.getFile(scalaLib))
   }
 
   @Test
   def testCompile = {
-    val source = ScalaSource(this.getClass.getClassLoader.getResource("SimpleTest.scala"), libraries)
-    val result = source.compile()
+    val source = new ScalaSource (this.getClass.getClassLoader.getResource ("SimpleTest.scala"), libraries)
+    val result = source.compile ()
 
-    assertNotNull(result.lookupName("SimpleTest.class", false))
-    assertNotNull(result.lookupPath("org/test/AnotherSimpleTest.class", false))
+    assertNotNull (result.lookupName ("SimpleTest.class", false))
+    assertNotNull (result.lookupPath ("org/test/AnotherSimpleTest.class", false))
   }
 
   @Test
   def testTransform = {
-    val source = ScalaSource(this.getClass.getClassLoader.getResource("SimpleTest.scala"), libraries)
+    val source = new ScalaSource (this.getClass.getClassLoader.getResource("SimpleTest.scala"), libraries)
     val result = source.transform ()
-    //val result = new ByteArrayOutputStream
-    //
-    //ScalaTransformer.transform (libraries, source, result)
-    //
-    //var jar = new JarInputStream(new ByteArrayInputStream(result.toByteArray))
-    var jar = new JarInputStream(result)
-    var entries = getEntries(jar)
-    assertTrue(entries.contains("SimpleTest.class"))
-    assertTrue(entries.contains("org/test/AnotherSimpleTest.class"))
+    var jar = new JarInputStream (result)
+    var entries = getEntries (jar)
+    assertTrue (entries.contains ("SimpleTest.class"))
+    assertTrue (entries.contains ("org/test/AnotherSimpleTest.class"))
   }
 
   @Test
   def testTransformWithActivator = {
-    val source = ScalaSource(this.getClass.getClassLoader.getResource("TestWithActivator.scala"), libraries)
+    val source = new ScalaSource (this.getClass.getClassLoader.getResource ("TestWithActivator.scala"), libraries)
     val result = source.transform ()
-    //val result = new ByteArrayOutputStream()
-    //
-    //transformer.transform(source, result)
-    //
-    //var jar = new JarInputStream(new ByteArrayInputStream(result.toByteArray))
-    var jar = new JarInputStream(result)
-    var entries = getEntries(jar)
-    assertTrue(entries.contains("org/test/TestWithActivator.class"))
+    var jar = new JarInputStream (result)
+    var entries = getEntries (jar)
+    assertTrue (entries.contains ("org/test/TestWithActivator.class"))
 
     val manifest = jar.getManifest;
-    assertEquals("BundleActivator class should have been automatically detected",
-                 "org.test.TestWithActivator", manifest.getMainAttributes.getValue("Bundle-Activator"))
-    assertTrue("Bundle-SymbolicName should have a decent value",
-               manifest.getMainAttributes().getValue("Bundle-SymbolicName").endsWith("TestWithActivator"));
+    assertEquals ("BundleActivator class should have been automatically detected",
+                  "org.test.TestWithActivator", manifest.getMainAttributes.getValue ("Bundle-Activator"))
+    assertTrue ("Bundle-SymbolicName should have a decent value",
+                manifest.getMainAttributes().getValue("Bundle-SymbolicName").endsWith("TestWithActivator"));
   }
 
 
