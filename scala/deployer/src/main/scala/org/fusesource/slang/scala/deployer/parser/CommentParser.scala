@@ -1,7 +1,4 @@
 /**
- * Copyright (C) FuseSource, Inc.
- * http://fusesource.com
- *
  * Copyright (C) Crossing-Tech SA, 2012.
  * Contact: <guillaume.yziquel@crossing-tech.com>
  *
@@ -17,20 +14,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package org.fusesource.slang.scala.deployer.parser
 
-/** OSGI-MANIFEST:
-  */
+import scala.util.parsing.combinator._
 
-class SimpleTest {
+object CommentParser extends RegexParsers {
 
-  def isWorking = true
+	override def skipWhitespace = false
 
-}
+	private def openComment = regex("""/\*""".r)
 
-package org.test {
+	private def closeComment = regex("""\*/""".r)
 
-  class AnotherSimpleTest
+	private def textComment = regex("""^(((?!\*/).|\n))*""".r)
 
-  
+	private def comment = openComment ~> textComment <~ closeComment
+
+	def parseComment (s : String) : ParseResult[Any] = parse (comment, s)
 
 }

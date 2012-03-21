@@ -2,6 +2,9 @@
  * Copyright (C) FuseSource, Inc.
  * http://fusesource.com
  *
+ * Copyright (C) Crossing-Tech SA, 2012.
+ * Contact: <guillaume.yziquel@crossing-tech.com>
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -30,16 +33,16 @@ class ScalaDeploymentListener extends ArtifactUrlTransformer {
   val LOG = LogFactory.getLog(classOf[ScalaDeploymentListener])
 
   def canHandle(artifact: File) = {
-    artifact.isFile() && artifact.getName().endsWith(".scala")
+    artifact.isFile && artifact.getName.endsWith(".scala")
   }
 
   def transform(artifact: URL) : URL = {
     try {
-        new URL("scala", null, artifact.toString());
+        new URL("scala", null, artifact.toString)
     } catch {
       case e: Exception => {
-        LOG.error("Unable to build scala bundle", e);
-        return null;
+        LOG.error("Unable to build scala bundle", e)
+        null
       }
     }
   }

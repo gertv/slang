@@ -2,6 +2,9 @@
  * Copyright (C) Crossing-Tech SA, 2012.
  * Contact: <guillaume.yziquel@crossing-tech.com>
  *
+ * Copyright (C) FuseSource, Inc.
+ * http://fusesource.com
+ *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
@@ -49,6 +52,8 @@ class ScalaSource (val url : URL, val libraries : List[AbstractFile]) extends Ab
 			AbstractFile.getDirectory(jar) :: Bundles.create (ctxt.getBundles)
 		}
 	)
+
+	/**********************************************************************/
 
 	/* It should be noted that the Scala compiler has the following piece of
 	   code to read so-called AbstractFiles. See SourceReader.scala, lines
@@ -125,6 +130,8 @@ class ScalaSource (val url : URL, val libraries : List[AbstractFile]) extends Ab
 		   prefix that is fed to a ScalaSource instance at construct-time. */
 		plainFile.toString
 
+	/**********************************************************************/
+
 	def compile () : AbstractFile = {
 		LOG.debug ("Compiling " + this + " using embedded Scala compiler.")
 		(new ScalaCompiler (libraries)).compile (this)
@@ -137,10 +144,18 @@ class ScalaSource (val url : URL, val libraries : List[AbstractFile]) extends Ab
 
 	def transform () = {
 		LOG.info ("Transforming " + this + " into an OSGi bundle.")
+		manifest ()
 		archive (compile ())
 	}
 
 	def manifest () {
+		import parser.CommentParser._
+
+		val source = io.Source.fromInputStream(input).getLines().mkString("\n")
+		//LOG.info ("Manifest: \n" + source)
+
+		val c = parseComment(source)
+		LOG.info("Comment:\n" + c)
 		/* TODO: Extract manifest from this abstract file. */
 	}
 }
