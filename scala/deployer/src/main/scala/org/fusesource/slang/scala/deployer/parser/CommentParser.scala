@@ -18,18 +18,35 @@ package org.fusesource.slang.scala.deployer.parser
 
 import scala.util.parsing.combinator._
 
+sealed abstract class Item
+case class Code (code : String) extends Item
+case class Comment (code : String) extends Item
+
 object CommentParser extends RegexParsers {
 
 	override def skipWhitespace = false
 
-	private def openComment = regex("""/\*""".r)
+	private def spaces = regex("""[ \t\n]*""".r)
 
-	private def closeComment = regex("""\*/""".r)
+	private def openComment = spaces ~> regex("""/\*""".r)
 
-	private def textComment = regex("""^(((?!\*/).|\n))*""".r)
+	private def closeComment = regex("""\*/""".r) <~ spaces
 
-	private def comment = openComment ~> textComment <~ closeComment
+	private def textComment = regex("""^((?!\*/).|\n)*""".r)
 
-	def parseComment (s : String) : ParseResult[Any] = parse (comment, s)
+	private def comment : Parser[Comment] = openComment ~> textComment <~ closeComment ^^ { case s : String => println("Found comment"); Comment(s) }
+
+	/* NOTE: Use + instead of * in the following regexp
+	   to avoid infinite loops while parsing. */
+	private def code : Parser[Code] = regex("""^((?!/\*).|\n)+""".r) ^^ { case s : String => println("Found code"); Code(s) }
+
+	private def items : Parser[List[Item]] = (( comment | code ) * )
+
+	def parse (s : String) : ParseResult[List[Item]] = {
+		println("Parsing")
+		val res = parse (items, s)
+		println("Parsed")
+		res
+	}
 
 }

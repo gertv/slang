@@ -149,12 +149,14 @@ class ScalaSource (val url : URL, val libraries : List[AbstractFile]) extends Ab
 	}
 
 	def manifest () {
-		import parser.CommentParser._
 
 		val source = io.Source.fromInputStream(input).getLines().mkString("\n")
 		//LOG.info ("Manifest: \n" + source)
 
-		val c = parseComment(source)
+		import parser.CommentParser._
+		import scala.util.parsing.combinator._
+
+		val c : ParseResult[List[parser.Item]] = parse(source)
 		LOG.info("Comment:\n" + c)
 		/* TODO: Extract manifest from this abstract file. */
 	}
