@@ -20,9 +20,32 @@ import scala.util.parsing.combinator._
 
 sealed abstract class Item
 case class Code (code : String) extends Item
-case class Comment (code : String) extends Item
 
-object CommentParser extends RegexParsers {
+abstract class Commented extends Item
+case class Comment (code : String) extends Commented
+case class Manifest extends Commented
+
+object ManifestParser extends RegexParsers {
+
+	override def skipWhitespace = false
+
+	private def spaces = regex("""([ \t\n]|\n[ \t]*\*[ \t]*)*""".r)
+
+	private def manifestHeader = spaces ~> regex("""OSGI-MANIFEST:""".r) <~ spaces ^^ { case _ : String => {}}
+
+	private def manifest = regex("""\**""".r) ~> manifestHeader
+
+	def parse (comment : Comment) : Boolean = comment match {
+	case Comment (c) => parse (manifest, c) match {
+		case Success ((), _) => true
+		case Failure (msg, _) => println (msg); false
+		case Error (msg, _) => throw new Exception (
+			"Slang deployer parsing error: " + msg)
+	}}
+
+}
+
+object ScriptParser extends RegexParsers {
 
 	override def skipWhitespace = false
 
@@ -32,9 +55,13 @@ object CommentParser extends RegexParsers {
 
 	private def closeComment = regex("""\*/""".r) <~ spaces
 
-	private def textComment = regex("""^((?!\*/).|\n)*""".r)
+	private def textComment = regex("""^((?!\*/).|\n)*""".r) ^^ (Comment(_))
 
-	private def comment : Parser[Comment] = openComment ~> textComment <~ closeComment ^^ { case s : String => println("Found comment"); Comment(s) }
+	private def comment : Parser[Commented] = openComment ~> textComment <~ closeComment ^^ {
+	case c : Comment => ManifestParser.parse(c) match {
+		case true => Manifest ()
+		case false => c
+	}}
 
 	/* NOTE: Use + instead of * in the following regexp
 	   to avoid infinite loops while parsing. */

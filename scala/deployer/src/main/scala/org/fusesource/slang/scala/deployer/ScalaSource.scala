@@ -153,7 +153,7 @@ class ScalaSource (val url : URL, val libraries : List[AbstractFile]) extends Ab
 		val source = io.Source.fromInputStream(input).getLines().mkString("\n")
 		//LOG.info ("Manifest: \n" + source)
 
-		import parser.CommentParser._
+		import parser.ScriptParser._
 		import scala.util.parsing.combinator._
 
 		val c : ParseResult[List[parser.Item]] = parse(source)
