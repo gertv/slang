@@ -38,7 +38,7 @@ object ManifestParser extends RegexParsers {
 	def parse (comment : Comment) : Boolean = comment match {
 	case Comment (c) => parse (manifest, c) match {
 		case Success ((), _) => true
-		case Failure (msg, _) => println (msg); false
+		case Failure (msg, _) => false
 		case Error (msg, _) => throw new Exception (
 			"Slang deployer parsing error: " + msg)
 	}}
@@ -65,15 +65,10 @@ object ScriptParser extends RegexParsers {
 
 	/* NOTE: Use + instead of * in the following regexp
 	   to avoid infinite loops while parsing. */
-	private def code : Parser[Code] = regex("""^((?!/\*).|\n)+""".r) ^^ { case s : String => println("Found code"); Code(s) }
+	private def code : Parser[Code] = regex("""^((?!/\*).|\n)+""".r) ^^ (Code(_))
 
 	private def items : Parser[List[Item]] = (( comment | code ) * )
 
-	def parse (s : String) : ParseResult[List[Item]] = {
-		println("Parsing")
-		val res = parse (items, s)
-		println("Parsed")
-		res
-	}
+	def parse (s : String) : ParseResult[List[Item]] = parse (items, s)
 
 }
