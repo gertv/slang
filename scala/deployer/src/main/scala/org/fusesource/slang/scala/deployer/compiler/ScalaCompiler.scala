@@ -25,7 +25,7 @@ import tools.nsc.io.{VirtualDirectory, AbstractFile}
 import tools.nsc.{Global, Settings}
 import tools.nsc.util._
 
-class ScalaCompileFailure extends Exception
+class ScalaCompileFailure (path : String) extends Exception ("Slang Scala compiler failed to compile " + path)
 
 /**
  * Scala compiler that uses a provided list of bundles as the compiler
@@ -72,7 +72,7 @@ class ScalaCompiler(bundles: List[AbstractFile]) {
        concurrently inherently seems to be a bad idea. */
     reporter.reset()
     run.compileFiles (List(source))
-    if (reporter.ERROR.count != 0) throw new ScalaCompileFailure ()
+    if (reporter.ERROR.count != 0) throw new ScalaCompileFailure (source.path)
 
     dir
 

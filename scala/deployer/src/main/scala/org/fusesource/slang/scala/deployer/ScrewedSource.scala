@@ -20,15 +20,73 @@
 package org.fusesource.slang.scala.deployer
 
 import java.io._
-import java.net.URL
+/*import java.net.URL*/
 import org.apache.commons.logging.LogFactory
-import org.osgi.framework.BundleContext
+/*import org.osgi.framework.BundleContext*/
 import tools.nsc.io.AbstractFile
-import tools.nsc.io.PlainFile
-import compiler._
-import archiver.ScalaArchiver
+/*import tools.nsc.io.PlainFile
+import compiler.Bundles
+import compiler.ScalaCompiler
+import archiver.ScalaArchiver*/
 
-class ScalaSource (val url : URL, val libraries : List[AbstractFile]) extends AbstractFile {
+class ScrewedSource (var f : AbstractFile) extends AbstractFile {
+
+	final val LOG = LogFactory.getLog(classOf[ScrewedSource])
+
+	def fail(msg : String) : Nothing = {
+		val s = "ScrewedSource: " + msg + " unimplemented."
+		println(s); LOG.debug(s); throw new Exception (s)
+	}
+
+	override def lookupNameUnchecked (name : String, directory : Boolean) = fail("lookupNameUnchecked")
+
+	override def lookupName (name : String, directory : Boolean) = fail("lookupName")
+
+	override def iterator = fail("iterator")
+
+	override def output = fail("output")
+
+	override def input = new ByteArrayInputStream ("""
+
+		import org.osgi.framework.{BundleContext, BundleActivator}
+
+		package org.fusesource.slang.scala.deployer.failure {
+
+			class MyActivator extends BundleActivator {
+
+				def start (context : BundleContext) { throw new Exception ("Failed to compile Scala code") }
+
+				def stop (context : BundleContext) { }
+
+			}
+
+		}
+
+	""".getBytes)
+
+	override def lastModified = fail("lastModified")
+
+	override def isDirectory = fail("isDirectory")
+
+	override def delete = fail("delete")
+
+	override def create = fail("create")
+
+	override def file = fail("file")
+
+	override def container = fail("container")
+
+	override def absolute = fail("absolute")
+
+	override def path = f.path
+
+	//override def path : String = file.path
+
+	override def name = fail("name")
+
+}
+
+/*class ScalaSource (val url : URL, val libraries : List[AbstractFile]) extends AbstractFile {
 
 	final val LOG = LogFactory.getLog(classOf[ScalaSource])
 
@@ -133,12 +191,9 @@ class ScalaSource (val url : URL, val libraries : List[AbstractFile]) extends Ab
 
 	def compile () : AbstractFile = {
 		LOG.debug ("Compiling " + this + " using embedded Scala compiler.")
-		try { (new ScalaCompiler (libraries)).compile (this) }
+		try (new ScalaCompiler (libraries)).compile (this)
 		catch {case e : ScalaCompileFailure =>
-			// TODO: We here pass the same libs as the AbstractFile. Would
-			// be nicer to trim down to just what is the needed for the
-			// error-reporting bundle. But, oh well...
-			(new ScalaCompiler (libraries)).compile (new ScrewedSource (this))
+		  (new ScrewedSource).compile
 		}
 	}
 
@@ -165,4 +220,4 @@ class ScalaSource (val url : URL, val libraries : List[AbstractFile]) extends Ab
 		LOG.info("Comment:\n" + c)
 		/* TODO: Extract manifest from this abstract file. */
 	}
-}
+}*/
