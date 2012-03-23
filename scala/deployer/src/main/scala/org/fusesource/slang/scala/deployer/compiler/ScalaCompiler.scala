@@ -19,11 +19,13 @@
  */
 package org.fusesource.slang.scala.deployer.compiler
 
-import tools.nsc.reporters.AbstractReporter
+import tools.nsc.reporters._
 import org.apache.commons.logging.LogFactory
 import tools.nsc.io.{VirtualDirectory, AbstractFile}
 import tools.nsc.{Global, Settings}
 import tools.nsc.util._
+
+class ScalaCompileFailure extends Exception
 
 /**
  * Scala compiler that uses a provided list of bundles as the compiler
@@ -62,7 +64,15 @@ class ScalaCompiler(bundles: List[AbstractFile]) {
       e.printStackTrace()
       throw e
     }
+
+    /* TODO: We are using the compiler in this bundle, and we access stateful
+       things, such as reports. Even though, at first glance, things seem local
+       enough not to worry about threads, we should worry about synchronising
+       access to the reporter. Even more than that: Accessing the compiler
+       concurrently inherently seems to be a bad idea. */
+    reporter.reset()
     run.compileFiles (List(source))
+    if (reporter.ERROR.count != 0) throw new ScalaCompileFailure ()
 
     dir
 
@@ -70,7 +80,9 @@ class ScalaCompiler(bundles: List[AbstractFile]) {
 
   lazy val settings = new Settings
 
-  lazy val reporter = new AbstractReporter {
+  lazy val reporter = new StoreReporter
+
+/*  lazy val reporter = new AbstractReporter {
 
     def displayPrompt () { println("compiler:") }
 
@@ -79,7 +91,7 @@ class ScalaCompiler(bundles: List[AbstractFile]) {
     }
 
     val settings = ScalaCompiler.this.settings
-  }
+  }*/
 
   lazy val compiler = new Global(settings, reporter) {
 
