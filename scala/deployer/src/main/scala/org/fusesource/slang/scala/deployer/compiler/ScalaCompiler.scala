@@ -72,9 +72,9 @@ class ScalaCompiler(bundles: List[AbstractFile]) {
 
   lazy val reporter = new AbstractReporter {
 
-    def displayPrompt = println("compiler:")
+    def displayPrompt () { println("compiler:") }
 
-    def display(position: Position, msg: String, severity: Severity): Unit = {
+    def display(position: Position, msg: String, severity: Severity) {
       LOG.warn(position + ":" + msg)
     }
 

@@ -32,9 +32,9 @@ import org.osgi.framework.BundleContext
  */
 class ScalaURLHandler extends AbstractURLStreamHandlerService {
   
-  private var LOG: Log = LogFactory.getLog(classOf[ScalaURLHandler])
-  private var PREFIX: String = "scala:"
-  private var SYNTAX: String = PREFIX + "<scala-source-uri>"
+  private val LOG: Log = LogFactory.getLog(classOf[ScalaURLHandler])
+  private val PREFIX: String = "scala:"
+  private val SYNTAX: String = PREFIX + "<scala-source-uri>"
 
   @BeanProperty var bundleContext : BundleContext = null
 
@@ -74,6 +74,6 @@ class ScalaURLHandler extends AbstractURLStreamHandlerService {
       }
     }
 
-    def connect {}
+    def connect () {}
   }
 }

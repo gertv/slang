@@ -23,7 +23,7 @@ case class Code (code : String) extends Item
 
 abstract class Commented extends Item
 case class Comment (code : String) extends Commented
-case class Manifest extends Commented
+case class Manifest () extends Commented
 
 object ManifestParser extends RegexParsers {
 
