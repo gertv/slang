@@ -38,25 +38,35 @@ class ScalaArchiver(bundles: List[AbstractFile]) {
 
   val LOG = LogFactory.getLog(classOf[ScalaArchiver])
 
+  // classloaders contains a classloader supposed to be able to load classes
+  // from a given bundles. In fact, one classloader for each bundle.
   val classloaders = bundles.map(new AbstractFileClassLoader(_, getClass.getClassLoader))
 
   def archive(dir: AbstractFile, source: ScalaSource) : InputStream = {
-    val classloader = createClassLoader(dir)
+
+    println("Archiving " + source)
+
+    val classloader : AbstractFileClassLoader = createClassLoader(dir)
 
     val props = new Properties
 
     val bytes = new ByteArrayOutputStream
     val jar = new JarOutputStream(bytes)
     entries(dir) { (name: String, file: AbstractFile) =>
+      println("Archiving - name: " + name + ", file:" + file)
       archiveFile(file, jar, name)
       try {
-        val theType = classloader.loadClass(name.replaceAll(".class", "").replaceAll("/", "."))
+	val renaming = name.replaceAll(".class", "").replaceAll("/", ".")
+	// TODO: Name processing is a bit crude... should be cleaned up.
+	println("Renaming name " + name + " in " + renaming)
+	val theType = classloader.loadClass(renaming)
         if (classOf[BundleActivator].isAssignableFrom(theType)) {
           LOG.debug("Discovered bundle activator " + theType.getName)
           props.put("Bundle-Activator", theType.getName)
         }
-      } catch {
-        case e: Exception => e.printStackTrace
+      } catch { case e: Exception =>
+	println ("Exception caught... while processing " + name)
+	e.printStackTrace
       }
 
     }
@@ -73,10 +83,13 @@ class ScalaArchiver(bundles: List[AbstractFile]) {
 
   def entries(dir: AbstractFile, path:String)(action: (String, AbstractFile) => Unit) : Unit = {
     dir.foreach { (file: AbstractFile) =>
+      println("Iterating through compiled files: " + file)
       val name = if (path.length == 0) { file.name } else { path + "/" + file.name }
       if (file.isDirectory) {
+        println ("  File is a directory.")
         entries(file, name)(action)
       } else {
+        println ("  File is not a directory.")
         action(name, file)
       }
     }    
@@ -107,28 +120,35 @@ class ScalaArchiver(bundles: List[AbstractFile]) {
   }
 
   def createClassLoader(dir: AbstractFile) = new AbstractFileClassLoader(dir, getClass.getClassLoader) {
-    override def findClass(name: String) : Class[_] = {
-      try {
-        // let's try the bundle we're generating first
-        super.findClass(name)
-      } catch {
-        // and then fall back to the rest of the bundles
-        case e: ClassNotFoundException => findClassInBundles(name)
-      }
+
+    // Set to true to trace classloader activity.
+    override protected def trace = true
+
+    override def findClass(name: String) : Class[_] = try {
+	println ("We are trying to find the class " + name)
+	// let's try the bundle we're generating first
+	super.findClass(name)
+    } catch { case e : ClassNotFoundException =>
+	println ("The class " + name + " could not be found.")
+	// and then fall back to the rest of the bundles
+	findClassInBundles(name)
     }
 
-    def findClassInBundles(name: String) : Class[_] = {
+    def findClassInBundles(name: String) : Class[_] =
       classloaders.map(cl => findClass(name, cl)).find(cls => cls.isDefined) match {
-        case Some(cls) => cls.get
-        case None => throw new ClassNotFoundException(name)
+        case Some(cls) => println ("FOUND!!!!!"); cls.get
+        case None => println ("NOT FOUND!!!!"); throw new ClassNotFoundException(name)
       }
-    }
 
     def findClass(name: String, loader: AbstractFileClassLoader) =
-      try {
-       Some(loader.findClass(name))
-      } catch {
-       case e: ClassNotFoundException => None
-      }
+	try {	println ("Trying to find " + name + " in some custom bundle.")
+		Some(loader.findClass(name))
+	} catch { case e: /* ClassNotFoundException */ Exception =>
+		/* TODO: Original code was catching the ClassNotFoundException,
+		   and an inadequate exception was falling through. So I widened
+		   the range of caught exceptions, but this is only a workaround. */
+		println ("But wasn't found...")
+		None 
+	}
   }
 }

@@ -169,31 +169,31 @@ object Bundles {
    * If a bundle has a file: URL, a {@PlainFile} is being used, otherwise w
    */
   def create(bundles: Array[Bundle]) : List[AbstractFile] = {
+    println(bundles.length)
     var result : List[AbstractFile] = List()
     for (bundle <- bundles; val index = bundles.indexOf(bundle)) {
-        var url = bundle.getResource("/");
+        var url = bundle.getResource("/")
         if (url == null) {
-            url = bundle.getResource("");
+            url = bundle.getResource("")
         }
 
         if (url != null) {
             if ("file" == url.getProtocol()) {
-                try {
-                    result = new PlainFile(new File(url.toURI())) :: result;
+                try {	println("Packing bundle as PlainFile: " + bundle.getSymbolicName())
+			result = new PlainFile(new File(url.toURI())) :: result
+                } catch { case e: URISyntaxException =>
+			println("Failed to pack bundle: " + bundle.getSymbolicName())
+			throw new IllegalArgumentException("Can't determine url of bundle " + bundle, e)
                 }
-                catch {
-                  case e: URISyntaxException => throw new IllegalArgumentException("Can't determine url of bundle " + bundle, e);
-                }
+            } else {
+		println("Packing bundle as DirEntry: " + bundle.getSymbolicName())
+                result = Bundles.create(bundle) :: result
             }
-            else {
-                result = Bundles.create(bundle) :: result;
-            }
-        }
-        else {
-            LOG.warn("Cannot retreive resources from Bundle. Skipping " + bundle.getSymbolicName());
+        } else {
+            println("Cannot retreive resources from Bundle. Skipping " + bundle.getSymbolicName())
         }
     }
-    result;
+    result
   }
 
 

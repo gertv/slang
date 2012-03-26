@@ -57,7 +57,8 @@ class ScrewedSource (var f : AbstractFile) extends AbstractFile {
 
                 }
 
-        """.getBytes("UTF-8")
+        """.getBytes("UTF-8")	// TODO: Check if global.settings.encoding.value is not better.
+				// see line 77 of AbstractFile.scala in the compiler's source code.
 
 	override def input = new ByteArrayInputStream(code)
 
