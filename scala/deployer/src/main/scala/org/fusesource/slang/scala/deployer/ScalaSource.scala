@@ -151,7 +151,7 @@ class ScalaSource(val url: URL, val libraries: List[AbstractFile]) extends Abstr
 
   def transform() = {
     LOG.info("Transforming " + this + " into an OSGi bundle.")
-    //manifest() // TODO: Not robust yet
+    // try { manifest() } catch {case e : Throwable => e.printStackTrace(); throw e} // TODO: Not robust enough yet.
     archive(compile())
   }
 
