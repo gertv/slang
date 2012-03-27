@@ -36,7 +36,7 @@ class ScalaCompiler(bundles: List[AbstractFile]) {
   final val LOG = LogFactory.getLog(classOf[ScalaCompiler])
 
   def compile(source: AbstractFile) : AbstractFile = {
-    LOG.info("Compiling " + source)
+    LOG.debug("Compiling " + source)
     val dir = new VirtualDirectory("memory", None)
 
     settings.outputDirs.setSingleOutput(dir)
