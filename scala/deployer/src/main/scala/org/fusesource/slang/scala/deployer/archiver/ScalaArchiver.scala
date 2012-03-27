@@ -78,17 +78,8 @@ class ScalaArchiver(bundles: List[AbstractFile]) {
   def entries(dir: AbstractFile, path: String)(action: (String, AbstractFile) => Unit): Unit = {
     dir.foreach {
       (file: AbstractFile) =>
-        println("Iterating through compiled files: " + file)
-        val name = if (path.length == 0) {file.name}
-        else {path + "/" + file.name}
-        if (file.isDirectory) {
-          println("  File is a directory.")
-          entries(file, name)(action)
-        }
-        else {
-          println("  File is not a directory.")
-          action(name, file)
-        }
+        val name = if (path.length == 0) file.name else path + "/" + file.name
+        if (file.isDirectory) entries(file, name)(action) else action(name, file)
     }
   }
 
@@ -122,32 +113,26 @@ class ScalaArchiver(bundles: List[AbstractFile]) {
     override protected def trace = true
 
     override def findClass(name: String): Class[_] = try {
-      println("We are trying to find the class " + name)
       // let's try the bundle we're generating first
       super.findClass(name)
     } catch {
       case e: ClassNotFoundException =>
-        println("The class " + name + " could not be found.")
         // and then fall back to the rest of the bundles
         findClassInBundles(name)
     }
 
     def findClassInBundles(name: String): Class[_] =
       classloaders.map(cl => findClass(name, cl)).find(cls => cls.isDefined) match {
-        case Some(cls) => println("FOUND!!!!!"); cls.get
-        case None => println("NOT FOUND!!!!"); throw new ClassNotFoundException(name)
+        case Some(cls) => cls.get
+        case None => throw new ClassNotFoundException(name)
       }
 
     def findClass(name: String, loader: AbstractFileClassLoader) =
-      try {
-        println("Trying to find " + name + " in some custom bundle.")
-        Some(loader.findClass(name))
-      } catch {
+      try Some(loader.findClass(name)) catch {
         case e: /* ClassNotFoundException */ Exception =>
           /* TODO: Original code was catching the ClassNotFoundException,
-         and an inadequate exception was falling through. So I widened
-         the range of caught exceptions, but this is only a workaround. */
-          println("But wasn't found...")
+          and an inadequate exception was falling through. So I widened
+          the range of caught exceptions, but this is only a workaround. */
           None
       }
   }

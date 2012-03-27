@@ -32,18 +32,9 @@ class ScalaDeploymentListener extends ArtifactUrlTransformer {
 
   val LOG = LogFactory.getLog(classOf[ScalaDeploymentListener])
 
-  def canHandle(artifact: File) = {
-    artifact.isFile && artifact.getName.endsWith(".scala")
-  }
+  def canHandle(artifact: File) = artifact.isFile && artifact.getName.endsWith(".scala")
 
-  def transform(artifact: URL) : URL = {
-    try {
-        new URL("scala", null, artifact.toString)
-    } catch {
-      case e: Exception => {
-        LOG.error("Unable to build scala bundle", e)
-        null
-      }
-    }
+  def transform(artifact: URL) : URL = try new URL("scala", null, artifact.toString) catch {
+      case e: Exception => LOG.error("Unable to build scala bundle", e); null
   }
 }

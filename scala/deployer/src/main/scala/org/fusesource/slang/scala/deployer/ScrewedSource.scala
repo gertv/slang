@@ -20,33 +20,30 @@ import java.io._
 import org.apache.commons.logging.LogFactory
 import tools.nsc.io.AbstractFile
 
-class ScrewedSource (var f : AbstractFile) extends AbstractFile {
+class ScrewedSource(var f: AbstractFile) extends AbstractFile {
 
-	final val LOG = LogFactory.getLog(classOf[ScrewedSource])
+  final val LOG = LogFactory.getLog(classOf[ScrewedSource])
 
-	LOG.debug ("ScrewedSource for " + f.path)
+  LOG.debug("ScrewedSource for " + f.path)
 
-	def fail(msg : String) : Nothing = {
-		val s = "ScrewedSource: " + msg + " unimplemented."
+  def fail(msg: String): Nothing = {
+    val s = "ScrewedSource: " + msg + " unimplemented."
     LOG.debug(s)
     throw new Exception(s)
-	}
+  }
 
-	override def lookupNameUnchecked (name : String, directory : Boolean) = fail("lookupNameUnchecked")
-
-	override def lookupName (name : String, directory : Boolean) = fail("lookupName")
-
-	override def iterator = fail("iterator")
-
-	override def output = fail("output")
+  override def lookupNameUnchecked(name: String, directory: Boolean) = fail("lookupNameUnchecked")
+  override def lookupName(name: String, directory: Boolean) = fail("lookupName")
+  override def iterator = fail("iterator")
+  override def output = fail("output")
 
   /* sizeOption needs to be overriden to provide the length of the input stream.
      It is NOT declared abstract in AbstractFile, which leads to weird IO errors
      if this override is not properly made.
    */
-	override def sizeOption = Some(code.length)
+  override def sizeOption = Some(code.length)
 
-	def code = """
+  def code = """
 
                 import org.osgi.framework.{BundleContext, BundleActivator}
 
@@ -62,27 +59,20 @@ class ScrewedSource (var f : AbstractFile) extends AbstractFile {
 
                 }
 
-        """.getBytes("UTF-8")	// TODO: Check if global.settings.encoding.value is not better.
-				// see line 77 of AbstractFile.scala in the compiler's source code.
+        """.getBytes("UTF-8")
+        // TODO: Check if global.settings.encoding.value is not better.
+        // see line 77 of AbstractFile.scala in the compiler's source code.
 
-	override def input = new ByteArrayInputStream(code)
+  override def input = new ByteArrayInputStream(code)
+  override def lastModified = fail("lastModified")
+  override def isDirectory = fail("isDirectory")
+  override def delete() {fail("delete")}
+  override def create() {fail("create")}
+  override def file = fail("file")
+  override def container = fail("container")
+  override def absolute = fail("absolute")
 
-	override def lastModified = fail("lastModified")
-
-	override def isDirectory = fail("isDirectory")
-
-	override def delete() { fail("delete")}
-
-	override def create() { fail("create")}
-
-	override def file = fail("file")
-
-	override def container = fail("container")
-
-	override def absolute = fail("absolute")
-
-	override def path = f.path
-
-	override def name = f.name
+  override def path = f.path
+  override def name = f.name
 
 }

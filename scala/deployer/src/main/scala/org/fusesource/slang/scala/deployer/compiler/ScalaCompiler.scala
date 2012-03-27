@@ -82,23 +82,12 @@ class ScalaCompiler(bundles: List[AbstractFile]) {
 
   lazy val reporter = new StoreReporter {
 
-	override def info0 (pos: Position, msg: String, severity: Severity, force: Boolean) {
-		LOG.warn(pos + ":" + msg)
-		super.info0(pos, msg: String, severity, force)
-	}
-
-  }
-
-/*  lazy val reporter = new AbstractReporter {
-
-    def displayPrompt () { println("compiler:") }
-
-    def display(position: Position, msg: String, severity: Severity) {
-      LOG.warn(position + ":" + msg)
+    override def info0(pos: Position, msg: String, severity: Severity, force: Boolean) {
+      LOG.warn(pos + ":" + msg)
+      super.info0(pos, msg: String, severity, force)
     }
 
-    val settings = ScalaCompiler.this.settings
-  }*/
+  }
 
   lazy val compiler = new Global(settings, reporter) {
 

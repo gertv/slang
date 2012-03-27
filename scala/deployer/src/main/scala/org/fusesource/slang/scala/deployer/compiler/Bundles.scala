@@ -42,21 +42,12 @@ object Bundles {
     lazy val (path: String, name: String) = getPathAndName(url)
     lazy val fullName: String = (path :: name :: Nil).filter(!_.isEmpty).mkString("/")
 
-    /**
-     * @return null
-     */
     def file: File = null
 
-    /**
-     * @return last modification time or 0 if not known
-     */
-    def lastModified: Long =
-      try {url.openConnection.getLastModified}
-      catch {case _ => 0}
+    def lastModified: Long = try url.openConnection.getLastModified catch {case _ => 0}
 
     @throws(classOf[IOException])
-    def container: AbstractFile = Option(parent).getOrElse(
-      throw new IOException("No container"))
+    def container: AbstractFile = Option(parent).getOrElse(throw new IOException("No container"))
 
     @throws(classOf[IOException])
     def input: InputStream = url.openStream()
@@ -86,44 +77,30 @@ object Bundles {
 
   class DirEntry(val bundle: Bundle, bundleUrl: URL, parent: DirEntry) extends BundleEntry(bundleUrl, parent) {
 
-    /**
-     * @return true
-     */
     def isDirectory: Boolean = true
 
     override def elements: Iterator[AbstractFile] = {
 
       @tailrec
       def removeTrailingSlash(s: String): String =
-        if (s == null || s.length == 0) {
-          s
-        }
-        else if (s.last == '/') {
-          removeTrailingSlash(s.substring(0, s.length - 1))
-        }
-        else {
-          s
-        }
+        if (s == null || s.length == 0) s
+        else if (s.last == '/') removeTrailingSlash(s.substring(0, s.length - 1))
+        else s
 
       import scala.collection.JavaConverters._
       bundle.getEntryPaths(fullName).asScala.map {
-        case entry: String => {
+        case entry: String =>
           val entryUrl = Option(Option(bundle.getResource("/" + entry)).
-              // Bundle.getReource seems to be inconsistent with respect to requiring
-              // a trailing slash.
-              getOrElse(bundle.getResource("/" + removeTrailingSlash(entry))))
+            // Bundle.getReource seems to be inconsistent with respect to requiring
+            // a trailing slash.
+            getOrElse(bundle.getResource("/" + removeTrailingSlash(entry))))
           entryUrl match {
             case None =>
               throw new IllegalStateException("For some reason, OSGi will not let use the entry " + entry)
             case Some(url) =>
-              if (entry.endsWith(".class")) {
-                new FileEntry(bundle, url, DirEntry.this)
-              }
-              else {
-                new DirEntry(bundle, url, DirEntry.this)
-              }
+              if (entry.endsWith(".class")) new FileEntry(bundle, url, DirEntry.this)
+              else new DirEntry(bundle, url, DirEntry.this)
           }
-        }
         case _ =>
           throw new ClassCastException("Items other than Strings found in an OSGi bundle's entry paths.")
       }
@@ -155,9 +132,6 @@ object Bundles {
 
   class FileEntry(val bundle: Bundle, url: URL, parent: DirEntry) extends BundleEntry(url, parent) {
 
-    /**
-     * @return false
-     */
     def isDirectory: Boolean = false
 
     override def sizeOption: Option[Int] = Some(bundle.getEntry(fullName).openConnection().getContentLength)
@@ -174,13 +148,9 @@ object Bundles {
 
     def absolute = unsupported("absolute() is unsupported")
 
-    def create() {
-      unsupported("create() is unsupported")
-    }
+    def create() {unsupported("create() is unsupported")}
 
-    def delete() {
-      unsupported("create() is unsupported")
-    }
+    def delete() {unsupported("create() is unsupported")}
   }
 
   /**
@@ -191,26 +161,17 @@ object Bundles {
     var result: List[AbstractFile] = List()
     for (bundle <- bundles; val index = bundles.indexOf(bundle)) {
       var url = bundle.getResource("/")
-      if (url == null) {
-        url = bundle.getResource("")
-      }
+      if (url == null) url = bundle.getResource("")
 
       if (url != null) {
         if ("file" == url.getProtocol) {
-          try {
-            result = new PlainFile(new File(url.toURI)) :: result
-          } catch {
-            case e: URISyntaxException =>
-              throw new IllegalArgumentException("Can't determine url of bundle " + bundle, e)
+          try result = new PlainFile(new File(url.toURI)) :: result
+          catch {case e: URISyntaxException =>
+            throw new IllegalArgumentException("Can't determine url of bundle " + bundle, e)
           }
-        }
-        else {
-          result = Bundles.create(bundle) :: result
-        }
+        } else result = Bundles.create(bundle) :: result
       }
-      else {
-        LOG.warn("Cannot retreive resources from Bundle. Skipping " + bundle.getSymbolicName);
-      }
+      else LOG.warn("Cannot retreive resources from Bundle. Skipping " + bundle.getSymbolicName);
     }
     result
   }

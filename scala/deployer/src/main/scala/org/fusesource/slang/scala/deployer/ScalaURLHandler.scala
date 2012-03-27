@@ -31,12 +31,12 @@ import org.osgi.framework.BundleContext
  * on the fly.  Needs to be registered in the OSGi registry.
  */
 class ScalaURLHandler extends AbstractURLStreamHandlerService {
-  
+
   private val LOG: Log = LogFactory.getLog(classOf[ScalaURLHandler])
   private val PREFIX: String = "scala:"
   private val SYNTAX: String = PREFIX + "<scala-source-uri>"
 
-  @BeanProperty var bundleContext : BundleContext = null
+  @BeanProperty var bundleContext: BundleContext = null
 
   /**
    * Open the connection for the given URL.
@@ -46,9 +46,8 @@ class ScalaURLHandler extends AbstractURLStreamHandlerService {
    * @throws IOException if an error occurs or if the URL is malformed.
    */
   def openConnection(url: URL): URLConnection = {
-    if (url.getPath == null || url.getPath.trim.length == 0) {
+    if (url.getPath == null || url.getPath.trim.length == 0)
       throw new MalformedURLException("Path can not be null or empty. Syntax: " + SYNTAX)
-    }
     LOG.debug("Scala source URL is: [" + url.getPath + "]")
     new Connection(url)
   }
@@ -57,23 +56,20 @@ class ScalaURLHandler extends AbstractURLStreamHandlerService {
 
     override def getInputStream: InputStream = {
       try {
-        val url = if (source.toExternalForm.startsWith(PREFIX)) {
-          new URL(source.toExternalForm.substring(PREFIX.length))
-        } else {
-          source
-        }
+        val url =
+          if (source.toExternalForm.startsWith(PREFIX))
+            new URL(source.toExternalForm.substring(PREFIX.length))
+          else source
 
-        new ScalaSource (url, bundleContext).transform()
-
-      }
-      catch {
-        case e: Exception => {
+        new ScalaSource(url, bundleContext).transform()
+      } catch {
+        case e: Exception =>
           LOG.error("Error creating bundle from Scala source code", e)
           throw e
-        }
       }
     }
 
-    def connect () {}
+    def connect() {}
   }
+
 }

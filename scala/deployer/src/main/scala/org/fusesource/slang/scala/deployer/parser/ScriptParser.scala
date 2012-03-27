@@ -19,56 +19,57 @@ package org.fusesource.slang.scala.deployer.parser
 import scala.util.parsing.combinator._
 
 sealed abstract class Item
-case class Code (code : String) extends Item
+case class Code(code: String) extends Item
 
 abstract class Commented extends Item
-case class Comment (code : String) extends Commented
-case class Manifest () extends Commented
+case class Comment(code: String) extends Commented
+case class Manifest() extends Commented
 
 object ManifestParser extends RegexParsers {
 
-	override def skipWhitespace = false
+  override def skipWhitespace = false
 
-	private def spaces = regex("""([ \t\n]|\n[ \t]*\*[ \t]*)*""".r)
+  private def spaces = regex("""([ \t\n]|\n[ \t]*\*[ \t]*)*""".r)
 
-	private def manifestHeader = spaces ~> regex("""OSGI-MANIFEST:""".r) <~ spaces ^^ { case _ : String => {}}
+  private def manifestHeader = spaces ~> regex("""OSGI-MANIFEST:""".r) <~ spaces ^^ {case _: String => {}}
 
-	private def manifest = regex("""\**""".r) ~> manifestHeader
+  private def manifest = regex("""\**""".r) ~> manifestHeader
 
-	def parse (comment : Comment) : Boolean = comment match {
-	case Comment (c) => parse (manifest, c) match {
-		case Success ((), _) => true
-		case Failure (msg, _) => false
-		case Error (msg, _) => throw new Exception (
-			"Slang deployer parsing error: " + msg)
-	}}
+  def parse(comment: Comment): Boolean = comment match {
+    case Comment(c) => parse(manifest, c) match {
+      case Success((), _) => true
+      case Failure(msg, _) => false
+      case Error(msg, _) => throw new Exception("Slang deployer parsing error: " + msg)
+    }
+  }
 
 }
 
 object ScriptParser extends RegexParsers {
 
-	override def skipWhitespace = false
+  override def skipWhitespace = false
 
-	private def spaces = regex("""[ \t\n]*""".r)
+  private def spaces = regex("""[ \t\n]*""".r)
 
-	private def openComment = spaces ~> regex("""/\*""".r)
+  private def openComment = spaces ~> regex("""/\*""".r)
 
-	private def closeComment = regex("""\*/""".r) <~ spaces
+  private def closeComment = regex("""\*/""".r) <~ spaces
 
-	private def textComment = regex("""^((?!\*/).|\n)*""".r) ^^ (Comment(_))
+  private def textComment = regex("""^((?!\*/).|\n)*""".r) ^^ (Comment(_))
 
-	private def comment : Parser[Commented] = openComment ~> textComment <~ closeComment ^^ {
-	case c : Comment => ManifestParser.parse(c) match {
-		case true => Manifest ()
-		case false => c
-	}}
+  private def comment: Parser[Commented] = openComment ~> textComment <~ closeComment ^^ {
+    case c: Comment => ManifestParser.parse(c) match {
+      case true => Manifest()
+      case false => c
+    }
+  }
 
-	/* NOTE: Use + instead of * in the following regexp
-	   to avoid infinite loops while parsing. */
-	private def code : Parser[Code] = regex("""^((?!/\*).|\n)+""".r) ^^ (Code(_))
+  /* NOTE: Use + instead of * in the following regexp
+     to avoid infinite loops while parsing. */
+  private def code: Parser[Code] = regex("""^((?!/\*).|\n)+""".r) ^^ (Code(_))
 
-	private def items : Parser[List[Item]] = (( comment | code ) * )
+  private def items: Parser[List[Item]] = ((comment | code) *)
 
-	def parse (s : String) : ParseResult[List[Item]] = parse (items, s)
+  def parse(s: String): ParseResult[List[Item]] = parse(items, s)
 
 }
