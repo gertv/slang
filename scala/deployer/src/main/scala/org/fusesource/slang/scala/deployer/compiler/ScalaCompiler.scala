@@ -40,7 +40,7 @@ class ScalaCompiler(bundles: List[AbstractFile]) {
     val dir = new VirtualDirectory("memory", None)
 
     settings.outputDirs.setSingleOutput(dir)
-    settings.verbose.value = true
+    settings.verbose.value = false
     settings.debug.value = false        /* Set to true for logging debugging info. */
     settings.Ylogcp.value = false       /* Set to true for classpath informations. */
     /* Yno-predefs and Yno-imports may be useful */
