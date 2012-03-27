@@ -36,11 +36,11 @@ import org.fusesource.slang.scala.deployer.ScalaSource
  */
 class ScalaArchiver(bundles: List[AbstractFile]) {
 
-  val LOG = LogFactory.getLog(classOf[ScalaArchiver])
+  private val LOG = LogFactory.getLog(classOf[ScalaArchiver])
 
   // classloaders contains a classloader supposed to be able to load classes
   // from a given bundles. In fact, one classloader for each bundle.
-  val classloaders = bundles.map(new AbstractFileClassLoader(_, getClass.getClassLoader))
+  private val classloaders = bundles.map(new AbstractFileClassLoader(_, getClass.getClassLoader))
 
   def archive(dir: AbstractFile, source: ScalaSource): InputStream = {
 
@@ -70,18 +70,19 @@ class ScalaArchiver(bundles: List[AbstractFile]) {
     createBundle(new ByteArrayInputStream(bytes.toByteArray), props, bsn(source.url))
   }
 
-  def entries(dir: AbstractFile)(action: (String, AbstractFile) => Unit): Unit =
+  private def entries(dir: AbstractFile)(action: (String, AbstractFile) => Unit) {
     entries(dir, "")(action)
+  }
 
-  def entries(dir: AbstractFile, path: String)(action: (String, AbstractFile) => Unit): Unit = {
+  private def entries(dir: AbstractFile, path: String)(action: (String, AbstractFile) => Unit) {
     dir.foreach {
       (file: AbstractFile) =>
         val name = if (path.length == 0) file.name else path + "/" + file.name
-        if (file.isDirectory) entries(file, name)(action) else action(name, file)
+        if (file.isDirectory) entries(file, name) { action } else action(name, file)
     }
   }
 
-  def archiveFile(file: AbstractFile, jar: JarOutputStream, name: String) = {
+  private def archiveFile(file: AbstractFile, jar: JarOutputStream, name: String) = {
     val entry = new JarEntry(name)
     jar.putNextEntry(entry)
     val bytes = new Array[Byte](1024)
@@ -94,7 +95,7 @@ class ScalaArchiver(bundles: List[AbstractFile]) {
     jar.closeEntry()
   }
 
-  def bsn(url: URL) = {
+  private def bsn(url: URL) = {
     var result = url.getPath
     if (result.endsWith(".scala")) {
       result = result.substring(0, result.length - 6)
@@ -105,7 +106,7 @@ class ScalaArchiver(bundles: List[AbstractFile]) {
     result.replaceAll("/", ".")
   }
 
-  def createClassLoader(dir: AbstractFile) = new AbstractFileClassLoader(dir, getClass.getClassLoader) {
+  private def createClassLoader(dir: AbstractFile) = new AbstractFileClassLoader(dir, getClass.getClassLoader) {
 
     // Set to true to trace classloader activity.
     //override protected def trace = true
