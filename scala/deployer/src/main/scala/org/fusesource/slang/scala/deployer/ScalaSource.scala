@@ -106,7 +106,8 @@ class ScalaSource(val url: URL, val libraries: List[AbstractFile]) extends Abstr
        happens, continue delegating calls to plainFile. */
     try super.toByteArray catch {
       case e: java.util.NoSuchElementException =>
-        val exc = new RuntimeException("Likely an implementation error: sizeOption in ScalaSource is not properly overriden.", e)
+        val exc = new RuntimeException(
+          "Likely an implementation error: sizeOption in ScalaSource is not properly overriden.", e)
         report(exc)
         throw exc
     }

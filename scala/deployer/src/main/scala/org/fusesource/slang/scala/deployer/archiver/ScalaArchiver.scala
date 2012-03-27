@@ -110,7 +110,7 @@ class ScalaArchiver(bundles: List[AbstractFile]) {
   def createClassLoader(dir: AbstractFile) = new AbstractFileClassLoader(dir, getClass.getClassLoader) {
 
     // Set to true to trace classloader activity.
-    override protected def trace = true
+    //override protected def trace = true
 
     override def findClass(name: String): Class[_] = try {
       // let's try the bundle we're generating first
