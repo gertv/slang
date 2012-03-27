@@ -61,9 +61,7 @@ class ScalaArchiver(bundles: List[AbstractFile]) {
             LOG.debug("Discovered bundle activator " + theType.getName)
             props.put("Bundle-Activator", theType.getName)
           }
-        } catch {
-          case e: Exception => e.printStackTrace()
-        }
+        } // catch {case e: Exception => e.printStackTrace()}
     }
 
     jar.close()

@@ -61,7 +61,7 @@ class ScalaCompiler(bundles: List[AbstractFile]) {
        stack trace to stdout. */
     val run = try { new compiler.Run } catch {case e : Throwable =>
       LOG.debug ("Failed to instantiate internal compiler.Run framework: " + e.getMessage)
-      e.printStackTrace()
+      //e.printStackTrace()
       throw e
     }
 
@@ -83,7 +83,7 @@ class ScalaCompiler(bundles: List[AbstractFile]) {
   lazy val reporter = new StoreReporter {
 
     override def info0(pos: Position, msg: String, severity: Severity, force: Boolean) {
-      LOG.warn(pos + ":" + msg)
+      LOG.debug(pos + ":" + msg)
       super.info0(pos, msg: String, severity, force)
     }
 
