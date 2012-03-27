@@ -28,7 +28,8 @@ class ScrewedSource (var f : AbstractFile) extends AbstractFile {
 
 	def fail(msg : String) : Nothing = {
 		val s = "ScrewedSource: " + msg + " unimplemented."
-		println(s); LOG.debug(s); throw new Exception (s)
+    LOG.debug(s)
+    throw new Exception(s)
 	}
 
 	override def lookupNameUnchecked (name : String, directory : Boolean) = fail("lookupNameUnchecked")
@@ -39,6 +40,10 @@ class ScrewedSource (var f : AbstractFile) extends AbstractFile {
 
 	override def output = fail("output")
 
+  /* sizeOption needs to be overriden to provide the length of the input stream.
+     It is NOT declared abstract in AbstractFile, which leads to weird IO errors
+     if this override is not properly made.
+   */
 	override def sizeOption = Some(code.length)
 
 	def code = """
@@ -66,9 +71,9 @@ class ScrewedSource (var f : AbstractFile) extends AbstractFile {
 
 	override def isDirectory = fail("isDirectory")
 
-	override def delete = fail("delete")
+	override def delete() { fail("delete")}
 
-	override def create = fail("create")
+	override def create() { fail("create")}
 
 	override def file = fail("file")
 

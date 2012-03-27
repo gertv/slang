@@ -22,9 +22,8 @@ package org.fusesource.slang.scala.deployer
 import org.junit.{Before, Test}
 import org.junit.Assert.{assertNotNull,assertTrue,assertEquals}
 import java.util.jar.JarInputStream
-import java.io.{ByteArrayInputStream, FileOutputStream, ByteArrayOutputStream, File}
+import java.io.File
 import tools.nsc.io.AbstractFile
-import org.osgi.framework.BundleContext
 
 /**
  * Test cases for {@link ScalaTransformer}
@@ -41,13 +40,13 @@ class ScalaTransformerTest {
     }
 
   @Before
-  def createTransformer = {
+  def createTransformer() {
     val scalaLib = new File (repository, "org/scala-lang/scala-library/2.9.1/scala-library-2.9.1.jar")
     libraries = List (AbstractFile.getFile(scalaLib))
   }
 
   @Test
-  def testCompile = {
+  def testCompile() {
     val source = new ScalaSource (this.getClass.getClassLoader.getResource ("SimpleTest.scala"), libraries)
     val result = source.compile ()
 
@@ -56,7 +55,7 @@ class ScalaTransformerTest {
   }
 
   @Test
-  def testTransform = {
+  def testTransform() {
     val source = new ScalaSource (this.getClass.getClassLoader.getResource("SimpleTest.scala"), libraries)
     val result = source.transform ()
     var jar = new JarInputStream (result)
@@ -66,7 +65,7 @@ class ScalaTransformerTest {
   }
 
   @Test
-  def testTransformWithActivator = {
+  def testTransformWithActivator() {
     val source = new ScalaSource (this.getClass.getClassLoader.getResource ("TestWithActivator.scala"), libraries)
     val result = source.transform ()
     var jar = new JarInputStream (result)
@@ -77,7 +76,7 @@ class ScalaTransformerTest {
     assertEquals ("BundleActivator class should have been automatically detected",
                   "org.test.TestWithActivator", manifest.getMainAttributes.getValue ("Bundle-Activator"))
     assertTrue ("Bundle-SymbolicName should have a decent value",
-                manifest.getMainAttributes().getValue("Bundle-SymbolicName").endsWith("TestWithActivator"));
+                manifest.getMainAttributes.getValue("Bundle-SymbolicName").endsWith("TestWithActivator"));
   }
 
 

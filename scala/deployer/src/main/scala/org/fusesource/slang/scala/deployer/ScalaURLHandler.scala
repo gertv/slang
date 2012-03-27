@@ -69,7 +69,7 @@ class ScalaURLHandler extends AbstractURLStreamHandlerService {
       catch {
         case e: Exception => {
           LOG.error("Error creating bundle from Scala source code", e)
-          throw new IOException("Error opening spring xml url").initCause(e).asInstanceOf[IOException]
+          throw e
         }
       }
     }
