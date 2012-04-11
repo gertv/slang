@@ -44,7 +44,9 @@ object Bundles {
 
     def file: File = null
 
-    def lastModified: Long = try url.openConnection.getLastModified catch {case _ => 0}
+    def lastModified: Long = try url.openConnection.getLastModified catch {
+      case _ => 0
+    }
 
     @throws(classOf[IOException])
     def container: AbstractFile = Option(parent).getOrElse(throw new IOException("No container"))
@@ -93,10 +95,12 @@ object Bundles {
           val entryUrl = Option(Option(bundle.getResource("/" + entry)).
             // Bundle.getReource seems to be inconsistent with respect to requiring
             // a trailing slash.
-            getOrElse(bundle.getResource("/" + removeTrailingSlash(entry))))
+            getOrElse(Option(bundle.getResource("/" + removeTrailingSlash(entry))).
+            // If the bundle is a xml file like activemq.xml, the entry META-INF cannot be reached so return the root URL
+            getOrElse(bundle.getResource("/"))))
           entryUrl match {
             case None =>
-              throw new IllegalStateException("For some reason, OSGi will not let use the entry " + entry)
+              throw new IllegalStateException("For some reason, OSGi will not let use the entry " + entry + " of bundleID " + bundle.getBundleId)
             case Some(url) =>
               if (entry.endsWith(".class")) new FileEntry(bundle, url, DirEntry.this)
               else new DirEntry(bundle, url, DirEntry.this)
@@ -125,9 +129,13 @@ object Bundles {
 
     def absolute = unsupported("absolute() is unsupported")
 
-    def create() {unsupported("create() is unsupported")}
+    def create() {
+      unsupported("create() is unsupported")
+    }
 
-    def delete() {unsupported("create() is unsupported")}
+    def delete() {
+      unsupported("create() is unsupported")
+    }
   }
 
   class FileEntry(val bundle: Bundle, url: URL, parent: DirEntry) extends BundleEntry(url, parent) {
@@ -148,9 +156,13 @@ object Bundles {
 
     def absolute = unsupported("absolute() is unsupported")
 
-    def create() {unsupported("create() is unsupported")}
+    def create() {
+      unsupported("create() is unsupported")
+    }
 
-    def delete() {unsupported("create() is unsupported")}
+    def delete() {
+      unsupported("create() is unsupported")
+    }
   }
 
   /**
@@ -166,8 +178,9 @@ object Bundles {
       if (url != null) {
         if ("file" == url.getProtocol) {
           try result = new PlainFile(new File(url.toURI)) :: result
-          catch {case e: URISyntaxException =>
-            throw new IllegalArgumentException("Can't determine url of bundle " + bundle, e)
+          catch {
+            case e: URISyntaxException =>
+              throw new IllegalArgumentException("Can't determine url of bundle " + bundle, e)
           }
         } else result = Bundles.create(bundle) :: result
       }

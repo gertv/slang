@@ -1,120 +1,119 @@
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-  <!--
-    Copyright (C) FuseSource, Inc.
-    http://fusesource.com
+    <!--
+      Copyright (C) FuseSource, Inc.
+      http://fusesource.com
 
-    Copyright (C) Crossing-Tech SA, 2012.
-    Contact: <guillaume.yziquel@crossing-tech.com>
+      Copyright (C) Crossing-Tech SA, 2012.
+      Contact: <guillaume.yziquel@crossing-tech.com>
 
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
+      Licensed under the Apache License, Version 2.0 (the "License");
+      you may not use this file except in compliance with the License.
+      You may obtain a copy of the License at
 
-       http://www.apache.org/licenses/LICENSE-2.0
+         http://www.apache.org/licenses/LICENSE-2.0
 
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
-  -->
+      Unless required by applicable law or agreed to in writing, software
+      distributed under the License is distributed on an "AS IS" BASIS,
+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+      See the License for the specific language governing permissions and
+      limitations under the License.
+    -->
 
-  <modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <artifactId>scala</artifactId>
-    <groupId>org.fusesource.slang</groupId>
-    <version>1.0.0-SNAPSHOT</version>
-  </parent>
+    <parent>
+        <artifactId>scala</artifactId>
+        <groupId>org.fusesource.slang</groupId>
+        <version>1.0.0-SNAPSHOT</version>
+    </parent>
 
-  <groupId>org.fusesource.slang.scala</groupId>
-  <artifactId>org.fusesource.slang.scala.deployer</artifactId>
-  <packaging>bundle</packaging>
+    <groupId>org.fusesource.slang.scala</groupId>
+    <artifactId>org.fusesource.slang.scala.deployer</artifactId>
+    <packaging>bundle</packaging>
 
-  <name>Slang :: Scala :: Deployer</name>
+    <name>Slang :: Scala :: Deployer</name>
 
-  <dependencies>
-    <dependency>
-      <groupId>org.apache.felix</groupId>
-      <artifactId>org.osgi.core</artifactId>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.scala-lang</groupId>
-      <artifactId>scala-library</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.ops4j.pax.logging</groupId>
-      <artifactId>pax-logging-api</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.felix</groupId>
-      <artifactId>org.apache.felix.fileinstall</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.ops4j.pax.swissbox</groupId>
-      <artifactId>pax-swissbox-bnd</artifactId>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-    </dependency>
-  </dependencies>
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.osgi.core</artifactId>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-library</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.ops4j.pax.logging</groupId>
+            <artifactId>pax-logging-api</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.fileinstall</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.ops4j.pax.swissbox</groupId>
+            <artifactId>pax-swissbox-bnd</artifactId>
+            <optional>true</optional>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+    </dependencies>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-eclipse-plugin</artifactId>
-        <version>2.9</version>
-        <configuration>
-          <downloadSources>true</downloadSources>
-          <buildcommands>
-            <buildcommand>ch.epfl.lamp.sdt.core.scalabuilder</buildcommand>
-          </buildcommands>
-          <additionalProjectnatures>
-            <projectnature>ch.epfl.lamp.sdt.core.scalanature</projectnature>
-          </additionalProjectnatures>
-          <classpathContainers>
-            <classpathContainer>org.eclipse.jdt.launching.JRE_CONTAINER</classpathContainer>
-            <classpathContainer>ch.epfl.lamp.sdt.launching.SCALA_CONTAINER</classpathContainer>
-          </classpathContainers>
-        </configuration>
-      </plugin>
-      <plugin>
-          <groupId>org.apache.felix</groupId>
-          <artifactId>maven-bundle-plugin</artifactId>
-          <configuration>
-              <instructions>
-                  <!-- Set the blueprint graceperiod flag to false to allow the bundle to start.
-                       See the blueprint config file for more details. -->
-                  <Bundle-SymbolicName>${project.artifactId};blueprint.graceperiod:=false</Bundle-SymbolicName>
-                  <Export-Package>${project.artifactId}*;version=${project.version}</Export-Package>
-                  <Import-Package>
-                    !${project.artifactId}*,
-                    org.apache.commons.logging;version="[1.1, 1.2)",
-                    *
-                  </Import-Package>
-                  <_versionpolicy>${bnd.version.policy}</_versionpolicy>
-                  <Embed-Dependency>pax-swissbox-bnd,bndlib,ops4j-base-lang</Embed-Dependency>
-                  <Embed-Transitive>true</Embed-Transitive>
-              </instructions>
-          </configuration>
-      </plugin>      
-    </plugins>
-  </build>
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-eclipse-plugin</artifactId>
+                <version>2.9</version>
+                <configuration>
+                    <downloadSources>true</downloadSources>
+                    <buildcommands>
+                        <buildcommand>ch.epfl.lamp.sdt.core.scalabuilder</buildcommand>
+                    </buildcommands>
+                    <additionalProjectnatures>
+                        <projectnature>ch.epfl.lamp.sdt.core.scalanature</projectnature>
+                    </additionalProjectnatures>
+                    <classpathContainers>
+                        <classpathContainer>org.eclipse.jdt.launching.JRE_CONTAINER</classpathContainer>
+                        <classpathContainer>ch.epfl.lamp.sdt.launching.SCALA_CONTAINER</classpathContainer>
+                    </classpathContainers>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <configuration>
+                    <instructions>
+                        <!-- Set the blueprint graceperiod flag to false to allow the bundle to start.
+                             See the blueprint config file for more details. -->
+                        <Bundle-SymbolicName>${project.artifactId};blueprint.graceperiod:=false</Bundle-SymbolicName>
+                        <Export-Package>${project.artifactId}*;version=${project.version}</Export-Package>
+                        <Import-Package>
+                            !${project.artifactId}*,
+                            org.apache.commons.logging;version="[1.1, 1.2)",
+                            *
+                        </Import-Package>
+                        <_versionpolicy>${bnd.version.policy}</_versionpolicy>
+                        <Embed-Dependency>pax-swissbox-bnd,bndlib,ops4j-base-lang</Embed-Dependency>
+                        <Embed-Transitive>true</Embed-Transitive>
+                    </instructions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
-  <reporting>
-    <plugins>
-      <plugin>
-        <groupId>org.scala-tools</groupId>
-        <artifactId>maven-scala-plugin</artifactId>
-        <version>2.15.2</version>
-      </plugin>
-    </plugins>
-  </reporting>
-  
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.scala-tools</groupId>
+                <artifactId>maven-scala-plugin</artifactId>
+                <version>2.15.2</version>
+            </plugin>
+        </plugins>
+    </reporting>
+
 </project>
