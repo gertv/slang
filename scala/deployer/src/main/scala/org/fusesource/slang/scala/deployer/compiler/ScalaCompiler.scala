@@ -19,11 +19,13 @@
  */
 package org.fusesource.slang.scala.deployer.compiler
 
-import tools.nsc.reporters.{AbstractReporter, Reporter}
+import tools.nsc.reporters._
 import org.apache.commons.logging.LogFactory
-import tools.nsc.io.{VirtualDirectory, PlainFile, AbstractFile}
-import tools.nsc.{Interpreter, Global, Settings}
+import tools.nsc.io.{VirtualDirectory, AbstractFile}
+import tools.nsc.{Global, Settings}
 import tools.nsc.util._
+
+class ScalaCompileFailure (path : String) extends Exception ("Slang Scala compiler failed to compile " + path)
 
 /**
  * Scala compiler that uses a provided list of bundles as the compiler
@@ -33,12 +35,12 @@ class ScalaCompiler(bundles: List[AbstractFile]) {
 
   final val LOG = LogFactory.getLog(classOf[ScalaCompiler])
 
-  def compile(sources: List[AbstractFile]) : AbstractFile = {
-    LOG.info("Compiling " + sources)
+  def compile(source: AbstractFile) : AbstractFile = {
+    LOG.debug("Compiling " + source)
     val dir = new VirtualDirectory("memory", None)
 
     settings.outputDirs.setSingleOutput(dir)
-    settings.verbose.value = true
+    settings.verbose.value = false
     settings.debug.value = false        /* Set to true for logging debugging info. */
     settings.Ylogcp.value = false       /* Set to true for classpath informations. */
     /* Yno-predefs and Yno-imports may be useful */
@@ -59,10 +61,18 @@ class ScalaCompiler(bundles: List[AbstractFile]) {
        stack trace to stdout. */
     val run = try { new compiler.Run } catch {case e : Throwable =>
       LOG.debug ("Failed to instantiate internal compiler.Run framework: " + e.getMessage)
-      e.printStackTrace()
+      //e.printStackTrace()
       throw e
     }
-    run.compileFiles(sources)
+
+    /* TODO: We are using the compiler in this bundle, and we access stateful
+       things, such as reports. Even though, at first glance, things seem local
+       enough not to worry about threads, we should worry about synchronising
+       access to the reporter. Even more than that: Accessing the compiler
+       concurrently inherently seems to be a bad idea. */
+    reporter.reset()
+    run.compileFiles (List(source))
+    if (reporter.ERROR.count != 0) throw new ScalaCompileFailure (source.path)
 
     dir
 
@@ -70,17 +80,16 @@ class ScalaCompiler(bundles: List[AbstractFile]) {
 
   lazy val settings = new Settings
 
-  lazy val reporter = new AbstractReporter {
-    def displayPrompt = println("compiler:")
+  lazy val reporter = new StoreReporter {
 
-    def display(position: Position, msg: String, severity: Severity): Unit = {
-      LOG.warn(position + ":" + msg)
+    override def info0(pos: Position, msg: String, severity: Severity, force: Boolean) {
+      LOG.debug(pos + ":" + msg)
+      super.info0(pos, msg: String, severity, force)
     }
 
-    val settings = ScalaCompiler.this.settings
   }
 
-    lazy val compiler = new Global(settings, reporter) {
+  lazy val compiler = new Global(settings, reporter) {
 
     override def classPath = {
       require(!forMSIL, "MSIL not supported")
@@ -94,7 +103,10 @@ class ScalaCompiler(bundles: List[AbstractFile]) {
        and injecting our OSGi bundles into this internal classpath. */
     override def rootLoader = {
       val cp = classPath.asInstanceOf[ClassPath[AbstractFile]]
-      (new loaders.JavaPackageLoader (cp)).asInstanceOf[LazyType]
+      new loaders.JavaPackageLoader (cp) match {
+        case loader : LazyType => loader
+        case _ => throw new Exception ("Failed to create rootLoader of embedded Scala compiler.")
+      }
     }
 
     def createClassPath [T] (original: ClassPath[T]) = {

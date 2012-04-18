@@ -1,142 +1,173 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
 
-  <!--
-    Copyright (C) FuseSource, Inc.
-    http://fusesource.com
+    <!--
+      Copyright (C) FuseSource, Inc.
+      http://fusesource.com
 
-    Copyright (C) Crossing-Tech SA, 2012.
-    Contact: <guillaume.yziquel@crossing-tech.com>
+      Copyright (C) Crossing-Tech SA, 2012.
+      Contact: <guillaume.yziquel@crossing-tech.com>
 
-    Licensed under the Apache License, Version 2.0 (the "License");
-    you may not use this file except in compliance with the License.
-    You may obtain a copy of the License at
+      Licensed under the Apache License, Version 2.0 (the "License");
+      you may not use this file except in compliance with the License.
+      You may obtain a copy of the License at
 
-       http://www.apache.org/licenses/LICENSE-2.0
+         http://www.apache.org/licenses/LICENSE-2.0
 
-    Unless required by applicable law or agreed to in writing, software
-    distributed under the License is distributed on an "AS IS" BASIS,
-    WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-    See the License for the specific language governing permissions and
-    limitations under the License.
-  -->
+      Unless required by applicable law or agreed to in writing, software
+      distributed under the License is distributed on an "AS IS" BASIS,
+      WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+      See the License for the specific language governing permissions and
+      limitations under the License.
+    -->
 
-  <modelVersion>4.0.0</modelVersion>
+    <modelVersion>4.0.0</modelVersion>
 
-  <groupId>org.fusesource.slang</groupId>
-  <artifactId>parent</artifactId>
-  <packaging>pom</packaging>
-  <version>1.0.0-SNAPSHOT</version>
-  <name>Slang</name>
-  <inceptionYear>2010</inceptionYear>
+    <groupId>org.fusesource.slang</groupId>
+    <artifactId>parent</artifactId>
+    <packaging>pom</packaging>
+    <version>1.0.0-SNAPSHOT</version>
+    <name>Slang</name>
+    <inceptionYear>2010</inceptionYear>
 
-  <properties>
-    <aries.blueprint.version>0.3.1</aries.blueprint.version>
-    <bnd.version.policy>[$(version;==;$(@)),$(version;+;$(@)))</bnd.version.policy>
-    <felix.fileinstall.version>3.1.10</felix.fileinstall.version>
-    <felix.osgi.version>1.4.0</felix.osgi.version>
-    <felix.plugin.version>2.3.6</felix.plugin.version>     
-    <junit.version>4.8.1</junit.version>
-    <karaf.version>2.2.5</karaf.version>
-    <osgi.version>4.2.0</osgi.version>
-    <pax.exam.version>1.2.0</pax.exam.version>
-    <pax.logging.version>1.6.3</pax.logging.version>
-    <pax.swissbox.version>1.2.0</pax.swissbox.version>
-    <scala.version>2.9.1</scala.version>
+    <properties>
+        <aries.blueprint.version>0.3.1</aries.blueprint.version>
+        <bnd.version.policy>[$(version;==;$(@)),$(version;+;$(@)))</bnd.version.policy>
+        <felix.fileinstall.version>3.1.10</felix.fileinstall.version>
+        <felix.osgi.version>1.4.0</felix.osgi.version>
+        <felix.plugin.version>2.3.6</felix.plugin.version>
+        <junit.version>4.8.1</junit.version>
+        <karaf.version>2.2.5</karaf.version>
+        <osgi.version>4.2.0</osgi.version>
+        <pax.exam.version>1.2.0</pax.exam.version>
+        <pax.logging.version>1.6.3</pax.logging.version>
+        <pax.swissbox.version>1.2.0</pax.swissbox.version>
+        <scala.version>2.9.1</scala.version>
 
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    </properties>
 
-  <modules>
-    <module>scala</module>
-    <module>features</module>
-  </modules>
+    <modules>
+        <module>scala</module>
+        <module>features</module>
+    </modules>
 
-  <build>
-    <defaultGoal>install</defaultGoal>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>maven-bundle-plugin</artifactId>
-        <version>${felix.plugin.version}</version>
-        <extensions>true</extensions>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-resources-plugin</artifactId>
-        <version>2.5</version>
-      </plugin>
-    </plugins>
-  </build>
+    <scm>
+        <connection>scm:git:git@wiki.crossing-tech.com:slang.git</connection>
+        <developerConnection>scm:git:git@wiki.crossing-tech.com:slang.git</developerConnection>
+    </scm>
 
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>org.osgi.core</artifactId>
-        <version>${felix.osgi.version}</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.ops4j.pax.logging</groupId>
-        <artifactId>pax-logging-api</artifactId>
-        <version>${pax.logging.version}</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.felix</groupId>
-        <artifactId>org.apache.felix.fileinstall</artifactId>
-        <version>${felix.fileinstall.version}</version>
-        <scope>provided</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.ops4j.pax.swissbox</groupId>
-        <artifactId>pax-swissbox-bnd</artifactId>
-        <version>1.2.0</version>
-      </dependency>
-      <dependency>
-        <groupId>org.osgi</groupId>
-        <artifactId>org.osgi.core</artifactId>
-        <version>${osgi.version}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.aries.blueprint</groupId>
-        <artifactId>org.apache.aries.blueprint</artifactId>
-        <version>${aries.blueprint.version}</version>
-        <exclusions>
-          <exclusion>
-            <groupId>org.apache.felix</groupId>
-            <artifactId>javax.servlet</artifactId>
-          </exclusion>
-        </exclusions>
-      </dependency>
+    <build>
+        <defaultGoal>install</defaultGoal>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <version>${felix.plugin.version}</version>
+                <extensions>true</extensions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>2.5</version>
+            </plugin>
+        </plugins>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <artifactId>maven-release-plugin</artifactId>
+                    <version>2.2.2</version>
+                    <configuration>
+                        <pushChanges>true</pushChanges>
+                    </configuration>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 
-      <!-- test-only dependencies -->
-      <dependency>
-        <groupId>junit</groupId>
-        <artifactId>junit</artifactId>
-        <version>${junit.version}</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.ops4j.pax.exam</groupId>
-        <artifactId>pax-exam</artifactId>
-        <version>${pax.exam.version}</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.ops4j.pax.exam</groupId>
-        <artifactId>pax-exam-container-default</artifactId>
-        <version>${pax.exam.version}</version>
-        <scope>test</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.ops4j.pax.exam</groupId>
-        <artifactId>pax-exam-junit</artifactId>
-        <version>${pax.exam.version}</version>
-        <scope>test</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>org.osgi.core</artifactId>
+                <version>${felix.osgi.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.ops4j.pax.logging</groupId>
+                <artifactId>pax-logging-api</artifactId>
+                <version>${pax.logging.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>org.apache.felix.fileinstall</artifactId>
+                <version>${felix.fileinstall.version}</version>
+                <scope>provided</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.ops4j.pax.swissbox</groupId>
+                <artifactId>pax-swissbox-bnd</artifactId>
+                <version>1.2.0</version>
+            </dependency>
+            <dependency>
+                <groupId>org.osgi</groupId>
+                <artifactId>org.osgi.core</artifactId>
+                <version>${osgi.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.aries.blueprint</groupId>
+                <artifactId>org.apache.aries.blueprint</artifactId>
+                <version>${aries.blueprint.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.felix</groupId>
+                        <artifactId>javax.servlet</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+
+            <!-- test-only dependencies -->
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>${junit.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.ops4j.pax.exam</groupId>
+                <artifactId>pax-exam</artifactId>
+                <version>${pax.exam.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.ops4j.pax.exam</groupId>
+                <artifactId>pax-exam-container-default</artifactId>
+                <version>${pax.exam.version}</version>
+                <scope>test</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.ops4j.pax.exam</groupId>
+                <artifactId>pax-exam-junit</artifactId>
+                <version>${pax.exam.version}</version>
+                <scope>test</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <distributionManagement>
+        <!-- use the following if you're not using a snapshot version. -->
+        <repository>
+            <id>nexusXtech</id>
+            <name>Nexus</name>
+            <url>https://wiki.crossing-tech.com/nexus/content/repositories/releases</url>
+        </repository>
+        <!-- use the following if you ARE using a snapshot version. -->
+        <snapshotRepository>
+            <id>nexusXtech</id>
+            <name>Nexus</name>
+            <url>https://wiki.crossing-tech.com/nexus/content/repositories/snapshots</url>
+        </snapshotRepository>
+    </distributionManagement>
 
 </project>

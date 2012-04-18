@@ -7,3 +7,4 @@ webgen.cache
 *.i??
 .idea
 *.swp
+atlassian-ide-plugin.xml
